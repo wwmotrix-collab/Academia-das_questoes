@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#6b21a8">
+  <meta name="description" content="Academia das Questões — Plataforma gamificada de aprendizado">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Academia">
+  <title>Academia das Questões</title>
+  <link rel="manifest" href="/manifest.json">
+  <link rel="apple-touch-icon" href="/assets/icons/icon-192.png">
+  <link rel="icon" type="image/png" href="/assets/icons/icon-192.png">
+  <link rel="stylesheet" href="/styles/main.css">
+  <link rel="stylesheet" href="/styles/animations.css">
+</head>
+<body>
+
+<!-- ══════════════ PARTICLES ══════════════ -->
+<canvas id="particles-canvas"></canvas>
+
+<!-- ══════════════ CONFETTI ══════════════ -->
+<canvas id="confetti-canvas"></canvas>
+
+<!-- ══════════════ LOADING ══════════════ -->
+<div class="loading-screen" id="loading-screen">
+  <div class="loading-crystal animate-float">💎</div>
+  <div class="loading-title">Academia das Questões</div>
+  <div class="loading-bar"><div class="loading-fill"></div></div>
+</div>
+
+<!-- ══════════════ APP HEADER ══════════════ -->
+<header class="app-header" id="app-header" style="display:none;">
+  <div class="header-logo">
+    Academia das Questões
+    <span id="header-name"></span>
+  </div>
+  <div class="header-xp">
+    <span class="xp-icon">⚡</span>
+    <span id="header-xp">0</span> XP
+  </div>
+  <div class="header-rank" id="header-rank"></div>
+  <button class="btn-logout" id="btn-logout">Sair</button>
+</header>
+
+<!-- ══════════════ LOGIN SCREEN ══════════════ -->
+<div id="screen-login" class="screen active">
+  <div class="login-box">
+    <div class="login-logo">
+      <span class="crystal-icon animate-crystal">💎</span>
+      <span class="academy-name">Academia das Questões</span>
+      <span class="academy-sub">CAPÍTULO 1 — A GRANDE AVALIAÇÃO</span>
+    </div>
+
+    <div class="login-title">✦ ENTRE NA ACADEMIA ✦</div>
+
+    <form id="login-form" autocomplete="off">
+      <div class="form-group">
+        <label for="login-name">SEU NOME</label>
+        <input
+          type="text"
+          id="login-name"
+          class="form-input"
+          placeholder="Digite seu nome completo..."
+          maxlength="60"
+          required
+          autocomplete="name"
+        >
+      </div>
+      <div class="form-group">
+        <label for="login-class">CÓDIGO DA TURMA</label>
+        <input
+          type="text"
+          id="login-class"
+          class="form-input"
+          placeholder="Ex: TURMA-A, 5ANO-B..."
+          maxlength="20"
+          required
+          autocomplete="off"
+        >
+      </div>
+      <button type="submit" class="btn-login" id="btn-login">
+        ✦ Entrar na Academia ✦
+      </button>
+      <div class="login-error" id="login-error"></div>
+    </form>
+
+    <div class="login-offline">
+      ⚡ Funciona offline após o primeiro acesso
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════ INDEX SCREEN ══════════════ -->
+<div id="screen-index" class="screen">
+
+  <!-- Student hero -->
+  <div class="student-hero">
+    <div class="greeting" id="student-greeting">Bem-vinda de volta,</div>
+    <div class="student-name" id="student-display-name"></div>
+    <div class="student-class" id="student-class"></div>
+  </div>
+
+  <!-- XP / Rank / Progress panel -->
+  <div class="progress-panel" style="margin:0 16px 18px;">
+    <div class="progress-top">
+      <div class="xp-display">
+        <div>
+          <div class="xp-number" id="xp-number">0</div>
+          <div class="xp-label">XP total</div>
+        </div>
+      </div>
+      <div class="rank-badge" id="rank-badge">🌿 Aprendiz</div>
+    </div>
+    <div class="xp-bar-wrap">
+      <div class="xp-bar-track">
+        <div class="xp-bar-fill" id="xp-bar-fill" style="width:0%"></div>
+      </div>
+      <div class="xp-next" id="xp-next"></div>
+    </div>
+    <div class="badges-row" id="badges-row"></div>
+  </div>
+
+  <!-- Activities grid -->
+  <div style="padding:0 16px;">
+    <div class="index-section-title">SUAS MISSÕES</div>
+    <div class="activities-grid" id="activities-grid"></div>
+  </div>
+
+  <!-- Footer -->
+  <div style="text-align:center;padding:28px 16px 12px;font-family:'Cinzel',serif;font-size:11px;color:rgba(245,158,11,0.55);letter-spacing:2px;">
+    ✦ A Jornada está apenas começando... ✦<br>
+    Cada atividade é uma nova missão. Você está pronta?
+  </div>
+</div>
+
+<!-- ══════════════ ACTIVITY SCREEN ══════════════ -->
+<div id="screen-activity" class="screen">
+  <!-- Content injected by UI.renderActivity() -->
+</div>
+
+<!-- ══════════════ CELEBRATION OVERLAY ══════════════ -->
+<div class="celebration-overlay" id="celebration-overlay">
+  <div class="celebration-box">
+    <span class="celebration-emoji" id="cel-emoji">🏆</span>
+    <div class="celebration-title" id="cel-title">Parabéns!</div>
+    <div class="celebration-msg" id="cel-msg"></div>
+    <div class="result-badges" id="cel-badges" style="display:none;"></div>
+    <button class="btn-celebration" id="cel-close">✦ Continuar Jornada ✦</button>
+  </div>
+</div>
+
+<!-- ══════════════ SYNC INDICATOR ══════════════ -->
+<div class="sync-indicator" id="sync-indicator">
+  <div class="sync-dot"></div>
+  <span class="sync-text">Salvando...</span>
+</div>
+
+<!-- ══════════════ INSTALL PROMPT ══════════════ -->
+<div class="install-prompt" id="install-prompt">
+  <p>📲 Instale a <strong>Academia das Questões</strong> no seu celular para acessar offline!</p>
+  <button class="btn-install" id="btn-install">Instalar</button>
+  <button class="btn-dismiss" id="btn-dismiss">✕</button>
+</div>
+
+<!-- ══════════════ SCRIPTS ══════════════ -->
+<script src="/scripts/data.js"></script>
+<script src="/scripts/db.js"></script>
+<script src="/scripts/auth.js"></script>
+<script src="/scripts/gamification.js"></script>
+<script src="/scripts/ui.js"></script>
+<script src="/scripts/app.js"></script>
+
+</body>
+</html>

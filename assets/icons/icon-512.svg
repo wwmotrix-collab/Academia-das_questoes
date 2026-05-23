@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
+  <defs>
+    <radialGradient id="bg" cx="50%" cy="40%" r="60%">
+      <stop offset="0%" stop-color="#2d1060"/>
+      <stop offset="100%" stop-color="#0f0520"/>
+    </radialGradient>
+    <radialGradient id="gem" cx="40%" cy="30%" r="60%">
+      <stop offset="0%" stop-color="#c4b5fd"/>
+      <stop offset="50%" stop-color="#9333ea"/>
+      <stop offset="100%" stop-color="#6b21a8"/>
+    </radialGradient>
+  </defs>
+  <rect width="512" height="512" rx="92.16" fill="url(#bg)"/>
+  <rect width="512" height="512" rx="92.16" fill="none" stroke="#f59e0b" stroke-width="12.8"/>
+  <!-- Diamond shape -->
+  <polygon points="256,76.8 409.6,230.4 256,435.2 102.4,230.4" fill="url(#gem)" opacity="0.95"/>
+  <polygon points="256,76.8 409.6,230.4 256,256" fill="rgba(255,255,255,0.25)"/>
+  <!-- Gold border on gem -->
+  <polygon points="256,76.8 409.6,230.4 256,435.2 102.4,230.4" fill="none" stroke="#f59e0b" stroke-width="7.68"/>
+  <!-- Stars -->
+  <text x="61.44" y="112.64" font-size="51.2" fill="#fcd34d" opacity="0.8">✦</text>
+  <text x="399.36" y="112.64" font-size="40.96" fill="#fcd34d" opacity="0.6">✦</text>
+  <text x="419.84" y="399.36" font-size="30.72" fill="#fcd34d" opacity="0.5">✧</text>
+</svg>
