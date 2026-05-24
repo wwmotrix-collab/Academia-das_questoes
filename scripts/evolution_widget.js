@@ -105,3 +105,12 @@ window.EvoWidget = window.EvoWidget || {
   update: function () {},
   refresh: function () {}
 };
+
+window.EvoWidget = window.EvoWidget || {
+  init: function () {
+    console.warn("EvoWidget fallback ativo");
+  },
+  render: function () {},
+  update: function () {},
+  refresh: function () {}
+};
