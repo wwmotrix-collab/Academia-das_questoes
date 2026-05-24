@@ -1,0 +1,50 @@
+{
+  "version": 2,
+  "name": "academia-das-questoes-v3",
+  "builds": [
+    { "src": "index.html",           "use": "@vercel/static" },
+    { "src": "evolution/index.html", "use": "@vercel/static" }
+  ],
+  "routes": [
+    {
+      "src": "/sw.js",
+      "headers": {
+        "Cache-Control": "no-cache, no-store, must-revalidate",
+        "Service-Worker-Allowed": "/"
+      },
+      "dest": "/sw.js"
+    },
+    {
+      "src": "/manifest.json",
+      "headers": { "Content-Type": "application/manifest+json", "Cache-Control": "public, max-age=86400" },
+      "dest": "/manifest.json"
+    },
+    {
+      "src": "/assets/(.*)",
+      "headers": { "Cache-Control": "public, max-age=2592000, immutable" },
+      "dest": "/assets/$1"
+    },
+    {
+      "src": "/styles/(.*)",
+      "headers": { "Cache-Control": "public, max-age=86400" },
+      "dest": "/styles/$1"
+    },
+    {
+      "src": "/scripts/(.*)",
+      "headers": { "Cache-Control": "public, max-age=86400" },
+      "dest": "/scripts/$1"
+    },
+    { "src": "/evolution/(.*)", "dest": "/evolution/$1" },
+    { "src": "/(.*)",           "dest": "/index.html" }
+  ],
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+        { "key": "X-Content-Type-Options", "value": "nosniff" },
+        { "key": "X-Frame-Options",        "value": "DENY" },
+        { "key": "X-XSS-Protection",       "value": "1; mode=block" }
+      ]
+    }
+  ]
+}

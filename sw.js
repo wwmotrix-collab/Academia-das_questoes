@@ -1,33 +1,35 @@
 // ═══════════════════════════════════════════════════════
-// Academia das Questões — Service Worker v2
+// Academia das Questões V3 — Service Worker
 // ═══════════════════════════════════════════════════════
 
-const CACHE_NAME = 'academia-v2-cache-v1';
+const CACHE_NAME = 'academia-v3-cache-v1';
 const STATIC_ASSETS = [
   '/',
   '/index.html',
+  '/evolution/index.html',
   '/styles/main.css',
   '/styles/animations.css',
+  '/styles/evolution.css',
   '/scripts/data.js',
   '/scripts/db.js',
   '/scripts/auth.js',
   '/scripts/gamification.js',
   '/scripts/ui.js',
+  '/scripts/evolution_data.js',
+  '/scripts/evolution_db.js',
+  '/scripts/evolution_widget.js',
   '/scripts/app.js',
   '/manifest.json',
-  'https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Nunito:wght@400;600;700;800;900&display=swap'
 ];
 
-// Install — cache static assets
 self.addEventListener('install', event => {
   event.waitUntil(
     caches.open(CACHE_NAME)
-      .then(cache => cache.addAll(STATIC_ASSETS.filter(u => !u.startsWith('http'))))
+      .then(cache => cache.addAll(STATIC_ASSETS))
       .then(() => self.skipWaiting())
   );
 });
 
-// Activate — clean old caches
 self.addEventListener('activate', event => {
   event.waitUntil(
     caches.keys().then(keys =>
@@ -36,16 +38,15 @@ self.addEventListener('activate', event => {
   );
 });
 
-// Fetch — cache-first for static, network-first for API
 self.addEventListener('fetch', event => {
   const url = new URL(event.request.url);
 
-  // Supabase API — network first, fallback gracefully
+  // Supabase — network first
   if (url.hostname.includes('supabase.co')) {
     event.respondWith(
       fetch(event.request).catch(() =>
         new Response(JSON.stringify({ error: 'offline' }), {
-          headers: { 'Content-Type': 'application/json' }
+          headers: { 'Content-Type': 'application/json' },
         })
       )
     );
@@ -56,39 +57,36 @@ self.addEventListener('fetch', event => {
   if (url.hostname.includes('fonts.googleapis.com') || url.hostname.includes('fonts.gstatic.com')) {
     event.respondWith(
       caches.match(event.request).then(cached =>
-        cached || fetch(event.request).then(response => {
-          const clone = response.clone();
-          caches.open(CACHE_NAME).then(cache => cache.put(event.request, clone));
-          return response;
+        cached || fetch(event.request).then(res => {
+          const clone = res.clone();
+          caches.open(CACHE_NAME).then(c => c.put(event.request, clone));
+          return res;
         })
       )
     );
     return;
   }
 
-  // Static assets — cache first
+  // Static — cache first
   event.respondWith(
     caches.match(event.request).then(cached => {
       if (cached) return cached;
-      return fetch(event.request).then(response => {
-        if (!response || response.status !== 200 || response.type !== 'basic') return response;
-        const clone = response.clone();
-        caches.open(CACHE_NAME).then(cache => cache.put(event.request, clone));
-        return response;
+      return fetch(event.request).then(res => {
+        if (!res || res.status !== 200 || res.type !== 'basic') return res;
+        const clone = res.clone();
+        caches.open(CACHE_NAME).then(c => c.put(event.request, clone));
+        return res;
       });
     })
   );
 });
 
-// Background sync for offline answers
 self.addEventListener('sync', event => {
   if (event.tag === 'sync-results') {
-    event.waitUntil(syncPendingResults());
+    event.waitUntil(
+      self.clients.matchAll().then(clients =>
+        clients.forEach(c => c.postMessage({ type: 'SYNC_RESULTS' }))
+      )
+    );
   }
 });
-
-async function syncPendingResults() {
-  // Notify all clients to sync
-  const clients = await self.clients.matchAll();
-  clients.forEach(client => client.postMessage({ type: 'SYNC_RESULTS' }));
-}

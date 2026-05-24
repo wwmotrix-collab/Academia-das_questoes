@@ -1,24 +1,24 @@
-// ═══════════════════════════════════════════════════════════
-// Academia das Questões V2 — App Controller
-// ═══════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════════════
+// Academia das Questões V3 — App.js Patch
+// Integra o sistema evolutivo sem quebrar nada do V2
+//
+// COMO APLICAR:
+// Substitua o conteúdo de /scripts/app.js pelo código abaixo,
+// ou adicione os blocos marcados com "V3 PATCH" no app.js existente.
+// ═══════════════════════════════════════════════════════════════════
 
 const App = {
   _currentActivityId: null,
-  _deferredInstall: null,
-  _isOnline: navigator.onLine,
+  _deferredInstall:   null,
+  _isOnline:          navigator.onLine,
 
-  // ── Boot ──────────────────────────────────────────────
+  // ── Boot ────────────────────────────────────────────────────
   async init() {
     UI.showLoading(true);
-
-    // PWA
     App._initPWA();
     App._initOnlineDetection();
-
-    // Particles
     Gamification.initParticles();
 
-    // Try auto-login
     try {
       const loggedIn = await Auth.tryAutoLogin();
       if (loggedIn) {
@@ -34,30 +34,24 @@ const App = {
       UI.showScreen('screen-login');
     }
 
-    // Login form
     document.getElementById('login-form')?.addEventListener('submit', App.handleLogin);
-
-    // Logout
     document.getElementById('btn-logout')?.addEventListener('click', App.handleLogout);
 
-    // SW message (sync)
     navigator.serviceWorker?.addEventListener('message', e => {
       if (e.data?.type === 'SYNC_RESULTS') App._syncPendingData();
     });
   },
 
-  // ── Login handler ─────────────────────────────────────
+  // ── Login handler ────────────────────────────────────────────
   async handleLogin(e) {
     e.preventDefault();
-    const name      = document.getElementById('login-name')?.value || '';
+    const name      = document.getElementById('login-name')?.value  || '';
     const classCode = document.getElementById('login-class')?.value || '';
     const errEl     = document.getElementById('login-error');
     const btnEl     = document.getElementById('btn-login');
-
     errEl.classList.remove('show');
     btnEl.textContent = 'Entrando...';
-    btnEl.disabled = true;
-
+    btnEl.disabled    = true;
     try {
       const result = await Auth.login(name, classCode);
       UI.showSync('online', '✓ Conectado!');
@@ -67,16 +61,15 @@ const App = {
       errEl.classList.add('show');
     } finally {
       btnEl.textContent = '✦ Entrar na Academia ✦';
-      btnEl.disabled = false;
+      btnEl.disabled    = false;
     }
   },
 
-  // ── Post-login setup ──────────────────────────────────
+  // ── Post-login ───────────────────────────────────────────────
   async postLogin(student, isNew) {
     document.getElementById('app-header').style.display = 'flex';
     UI.updateHeader(student);
 
-    // Load data
     const [results, badges] = await Promise.all([
       DB.getResults(student.id),
       DB.getBadges(student.id),
@@ -88,14 +81,14 @@ const App = {
       setTimeout(() => {
         Gamification.showCelebration(
           'Bem-vinda à Academia!',
-          `Olá, <strong>${student.name}</strong>! Sua jornada começa agora. Complete atividades, ganhe XP e torne-se uma <strong>Mestra das Questões</strong>!`,
+          `Olá, <strong>${student.name}</strong>! Sua jornada começa agora. Complete atividades, evolua o seu Mimo e torne-se uma <strong>Mestra das Questões</strong>!`,
           '🎓', [], null
         );
       }, 600);
     }
   },
 
-  // ── Index ─────────────────────────────────────────────
+  // ── Show index ───────────────────────────────────────────────
   async showIndex() {
     const student = Auth.student;
     if (!student) { UI.showScreen('screen-login'); return; }
@@ -110,13 +103,17 @@ const App = {
     UI.showScreen('screen-index');
     App._currentActivityId = null;
 
-    // Try to sync any queued data
+    // ── V3 PATCH: inject + load MIMO widget ──────────────────
+    injectMimoWidgetSlot();
+    await EvoWidget.init(student);
+    // ── END V3 PATCH ─────────────────────────────────────────
+
     if (App._isOnline) {
       try { await DB.processSyncQueue(student.id); } catch {}
     }
   },
 
-  // ── Open activity ─────────────────────────────────────
+  // ── Open activity ────────────────────────────────────────────
   openActivity(id) {
     const act = ACTIVITIES.find(a => a.id === id);
     if (!act) return;
@@ -131,34 +128,30 @@ const App = {
     UI.showScreen('screen-activity');
   },
 
-  // ── Select MC option ──────────────────────────────────
+  // ── Select MC option ─────────────────────────────────────────
   selectOption(actId, qi, oi, el) {
     const resultMap = LS.get('resultMap') || {};
-    if (resultMap[actId]) return; // already finished
-
+    if (resultMap[actId]) return;
     const answers = LS.get('answers_' + actId) || {};
     answers[qi] = oi;
     LS.set('answers_' + actId, answers);
-
     el.closest('.options').querySelectorAll('.option').forEach(o => o.classList.remove('selected'));
     el.classList.add('selected');
   },
 
-  // ── Select TF ─────────────────────────────────────────
+  // ── Select TF ────────────────────────────────────────────────
   selectTF(actId, qi, ii, val, el) {
     const resultMap = LS.get('resultMap') || {};
     if (resultMap[actId]) return;
-
     const answers = LS.get('answers_' + actId) || {};
     if (!answers[qi]) answers[qi] = {};
     answers[qi][ii] = val;
     LS.set('answers_' + actId, answers);
-
     el.closest('.tf-buttons').querySelectorAll('.tf-btn').forEach(b => b.classList.remove('selected'));
     el.classList.add('selected');
   },
 
-  // ── Finish activity ───────────────────────────────────
+  // ── Finish activity ──────────────────────────────────────────
   async finishActivity(actId) {
     if (!confirm('Deseja concluir a atividade? As respostas serão corrigidas.')) return;
 
@@ -182,11 +175,9 @@ const App = {
     const rankLabel = getRankLabel(score, act.ranks);
     const xpEarned  = Gamification.calcXP(score, act.maxScore);
 
-    // Save result
     UI.showSync('syncing', 'Salvando...');
     await DB.saveResult(student.id, actId, score, act.maxScore, rankLabel, answers);
 
-    // Update XP
     const newTotalXP   = (student.total_xp || 0) + xpEarned;
     const newRankLabel = Gamification.getGlobalRank(newTotalXP).label;
     const oldRank      = Gamification.getGlobalRank(student.total_xp || 0).label;
@@ -197,55 +188,84 @@ const App = {
 
     UI.showSync('online', '✓ Salvo!');
 
-    // Update resultMap in LS
     const resultMap = LS.get('resultMap') || {};
-    resultMap[actId] = { activity_id: actId, score, max_score: act.maxScore, percentage: score/act.maxScore*100, rank_label: rankLabel };
+    resultMap[actId] = {
+      activity_id: actId, score, max_score: act.maxScore,
+      percentage: score / act.maxScore * 100, rank_label: rankLabel,
+    };
     LS.set('resultMap', resultMap);
 
-    // Badges
-    const results = await DB.getResults(student.id);
+    const results      = await DB.getResults(student.id);
     const completedCount = results.length;
-    const newBadges = await Gamification.checkBadges(student.id, completedCount, actId, score, act.maxScore, newTotalXP);
-
-    // Reload badges in LS
+    const newBadges    = await Gamification.checkBadges(
+      student.id, completedCount, actId, score, act.maxScore, newTotalXP
+    );
     await DB.getBadges(student.id);
+
+    // ── V3 PATCH: add XP to evolution + check stage unlock ───
+    let evoLevelUp    = false;
+    let newEvoStage   = null;
+    try {
+      const evoResult = await EvoWidget.onActivityComplete(student.id, xpEarned);
+      evoLevelUp = evoResult.levelUp;
+
+      // Check if a new evolution stage was unlocked
+      newEvoStage = await EvoWidget.checkStageUnlock(student.id);
+    } catch (e) {
+      console.warn('Evolution update error (non-critical):', e);
+    }
+    // ── END V3 PATCH ─────────────────────────────────────────
 
     // XP flash
     setTimeout(() => {
       const btn = document.querySelector('.btn-finish');
       if (btn) {
         const rect = btn.getBoundingClientRect();
-        Gamification.showXPGain(xpEarned, rect.left + rect.width/2, rect.top);
+        Gamification.showXPGain(xpEarned, rect.left + rect.width / 2, rect.top);
       }
     }, 300);
 
-    // Re-render activity with results
     UI.renderActivity(act, answers, true, resultMap[actId]);
     UI.updateHeader(Auth.currentStudent);
 
-    // Rank-up notification
     const rankUpMsg = newRankLabel !== oldRank
       ? `🎊 Você subiu para <strong>${newRankLabel}</strong>!`
       : `Você ganhou <strong>+${xpEarned} XP</strong>! Total: <strong>${newTotalXP} XP</strong>`;
 
-    const pct = Math.round(score / act.maxScore * 100);
+    // ── V3 PATCH: enrich celebration with evo info ───────────
+    let evoMsg = '';
+    if (evoLevelUp) {
+      const evo = EvoWidget.currentEvo;
+      evoMsg = `<br><br>⭐ <strong>Seu Mimo evoluiu para o Nível ${evo?.evolution_level}!</strong>`;
+    }
+    if (newEvoStage) {
+      evoMsg += `<br>🌟 <strong>Estágio ${newEvoStage.stage} desbloqueado: ${newEvoStage.stageInfo.name}!</strong> Visite a Árvore Evolutiva para fazer sua escolha!`;
+    }
+    // ── END V3 PATCH ─────────────────────────────────────────
+
+    const pct        = Math.round(score / act.maxScore * 100);
     const celebEmoji = pct === 100 ? '🏆' : pct >= 75 ? '⭐' : pct >= 50 ? '💎' : '📘';
     const celebTitle = pct === 100 ? 'Atividade Perfeita!' : pct >= 75 ? 'Excelente resultado!' : pct >= 50 ? 'Boa missão, heroína!' : 'Missão concluída!';
+
+    // Add evo button to new badges if stage unlocked
+    const extraBadges = newEvoStage
+      ? [{ icon: '🌟', name: 'Novo Estágio Desbloqueado!' }]
+      : [];
 
     setTimeout(() => {
       Gamification.showCelebration(
         celebTitle,
-        `Você acertou <strong>${score} de ${act.maxScore}</strong> questões (${pct}%)! ${rankUpMsg}`,
+        `Você acertou <strong>${score} de ${act.maxScore}</strong> questões (${pct}%)! ${rankUpMsg}${evoMsg}`,
         celebEmoji,
-        newBadges,
+        [...newBadges, ...extraBadges],
         null
       );
     }, 500);
   },
 
-  // ── Redo activity ─────────────────────────────────────
+  // ── Redo activity ────────────────────────────────────────────
   redoActivity(actId) {
-    if (!confirm('Deseja refazer a atividade? Seu resultado anterior será mantido, mas as respostas serão apagadas para nova tentativa.')) return;
+    if (!confirm('Deseja refazer a atividade? Seu resultado anterior será mantido, mas as respostas serão apagadas.')) return;
     LS.remove('answers_' + actId);
     const resultMap = LS.get('resultMap') || {};
     delete resultMap[actId];
@@ -253,7 +273,7 @@ const App = {
     App.openActivity(actId);
   },
 
-  // ── Logout ────────────────────────────────────────────
+  // ── Logout ───────────────────────────────────────────────────
   handleLogout() {
     if (!confirm('Deseja sair da Academia? Seu progresso está salvo.')) return;
     Auth.logout();
@@ -263,7 +283,7 @@ const App = {
     UI.showScreen('screen-login');
   },
 
-  // ── PWA ───────────────────────────────────────────────
+  // ── PWA ──────────────────────────────────────────────────────
   _initPWA() {
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker.register('/sw.js').catch(console.warn);
@@ -275,16 +295,16 @@ const App = {
     });
   },
 
-  // ── Online/offline ────────────────────────────────────
+  // ── Online/offline ───────────────────────────────────────────
   _initOnlineDetection() {
     window.addEventListener('online', () => {
       App._isOnline = true;
       UI.showSync('online', '✓ Reconectado!');
       const student = Auth.student;
       if (student) {
-        DB.processSyncQueue(student.id).then(() => {
-          UI.showSync('online', '✓ Sincronizado!');
-        }).catch(() => {});
+        DB.processSyncQueue(student.id)
+          .then(() => UI.showSync('online', '✓ Sincronizado!'))
+          .catch(() => {});
       }
     });
     window.addEventListener('offline', () => {
@@ -301,5 +321,5 @@ const App = {
   },
 };
 
-// Boot on DOM ready
+// Boot
 document.addEventListener('DOMContentLoaded', App.init);

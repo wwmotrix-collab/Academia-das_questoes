@@ -1,34 +1,25 @@
 {
   "name": "Academia das Questões",
   "short_name": "Academia",
-  "description": "Plataforma gamificada de aprendizado — Capítulo 1: A Grande Avaliação Inicial",
+  "description": "Plataforma gamificada de aprendizado — evolua o Mimo, conquiste capítulos!",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#0f0520",
   "theme_color": "#6b21a8",
   "orientation": "portrait-primary",
   "icons": [
-    {
-      "src": "assets/icons/icon-192.png",
-      "sizes": "192x192",
-      "type": "image/png",
-      "purpose": "any maskable"
-    },
-    {
-      "src": "assets/icons/icon-512.png",
-      "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "any maskable"
-    }
-  ],
-  "screenshots": [
-    {
-      "src": "assets/icons/screenshot-mobile.png",
-      "sizes": "390x844",
-      "type": "image/png",
-      "form_factor": "narrow"
-    }
+    { "src": "assets/icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
+    { "src": "assets/icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
   ],
   "categories": ["education", "games"],
-  "lang": "pt-BR"
+  "lang": "pt-BR",
+  "shortcuts": [
+    {
+      "name": "Árvore Evolutiva",
+      "short_name": "Mimo",
+      "description": "Ver evolução do Mimo",
+      "url": "/evolution/index.html",
+      "icons": [{ "src": "assets/icons/icon-192.png", "sizes": "192x192" }]
+    }
+  ]
 }

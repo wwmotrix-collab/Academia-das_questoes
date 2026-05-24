@@ -12,8 +12,9 @@
   <link rel="manifest" href="/manifest.json">
   <link rel="apple-touch-icon" href="/assets/icons/icon-192.png">
   <link rel="icon" type="image/png" href="/assets/icons/icon-192.png">
-  <link rel="stylesheet" href="./styles/main.css">
-  <link rel="stylesheet" href="./styles/animations.css">
+  <link rel="stylesheet" href="/styles/main.css">
+  <link rel="stylesheet" href="/styles/animations.css">
+  <link rel="stylesheet" href="/styles/evolution.css">
 </head>
 <body>
 
@@ -52,43 +53,26 @@
       <span class="academy-name">Academia das Questões</span>
       <span class="academy-sub">CAPÍTULO 1 — A GRANDE AVALIAÇÃO</span>
     </div>
-
     <div class="login-title">✦ ENTRE NA ACADEMIA ✦</div>
-
     <form id="login-form" autocomplete="off">
       <div class="form-group">
         <label for="login-name">SEU NOME</label>
-        <input
-          type="text"
-          id="login-name"
-          class="form-input"
+        <input type="text" id="login-name" class="form-input"
           placeholder="Digite seu nome completo..."
-          maxlength="60"
-          required
-          autocomplete="name"
-        >
+          maxlength="60" required autocomplete="name">
       </div>
       <div class="form-group">
         <label for="login-class">CÓDIGO DA TURMA</label>
-        <input
-          type="text"
-          id="login-class"
-          class="form-input"
+        <input type="text" id="login-class" class="form-input"
           placeholder="Ex: TURMA-A, 5ANO-B..."
-          maxlength="20"
-          required
-          autocomplete="off"
-        >
+          maxlength="20" required autocomplete="off">
       </div>
       <button type="submit" class="btn-login" id="btn-login">
         ✦ Entrar na Academia ✦
       </button>
       <div class="login-error" id="login-error"></div>
     </form>
-
-    <div class="login-offline">
-      ⚡ Funciona offline após o primeiro acesso
-    </div>
+    <div class="login-offline">⚡ Funciona offline após o primeiro acesso</div>
   </div>
 </div>
 
@@ -121,6 +105,12 @@
     </div>
     <div class="badges-row" id="badges-row"></div>
   </div>
+
+  <!-- ▼▼▼ V3: MIMO WIDGET SLOT ▼▼▼ -->
+  <div style="padding:0 16px;">
+    <div id="mimo-widget-slot"></div>
+  </div>
+  <!-- ▲▲▲ END V3 SLOT ▲▲▲ -->
 
   <!-- Activities grid -->
   <div style="padding:0 16px;">
@@ -165,12 +155,18 @@
 </div>
 
 <!-- ══════════════ SCRIPTS ══════════════ -->
-<script src="./scripts/data.js"></script>
-<script src="./scripts/db.js"></script>
-<script src="./scripts/auth.js"></script>
-<script src="./scripts/gamification.js"></script>
-<script src="./scripts/ui.js"></script>
-<script src="./scripts/app.js"></script>
+<!-- Core V2 (unchanged) -->
+<script src="/scripts/data.js"></script>
+<script src="/scripts/db.js"></script>
+<script src="/scripts/auth.js"></script>
+<script src="/scripts/gamification.js"></script>
+<script src="/scripts/ui.js"></script>
+<!-- V3: Evolution system -->
+<script src="/scripts/evolution_data.js"></script>
+<script src="/scripts/evolution_db.js"></script>
+<script src="/scripts/evolution_widget.js"></script>
+<!-- App controller (V3 patched) -->
+<script src="/scripts/app.js"></script>
 
 </body>
 </html>

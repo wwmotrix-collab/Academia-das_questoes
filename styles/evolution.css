@@ -1,0 +1,548 @@
+/* ═══════════════════════════════════════════════════════════════════
+   Academia das Questões V3 — Evolution Styles
+   ═══════════════════════════════════════════════════════════════════ */
+
+/* ── Variables (same root as main.css) ─────────────────────────── */
+:root {
+  --purple-dark:   #1a0a2e;
+  --purple-mid:    #2d1060;
+  --purple-accent: #6b21a8;
+  --purple-light:  #9333ea;
+  --gold:          #f59e0b;
+  --gold-light:    #fcd34d;
+  --gold-dark:     #92400e;
+  --text-light:    #f3e8ff;
+  --text-gold:     #fde68a;
+  --bg-dark:       #0f0520;
+  --crystal-blue:  #60a5fa;
+  --crystal-green: #34d399;
+  --font-display:  'Cinzel', serif;
+  --font-body:     'Nunito', sans-serif;
+  --xp-color:      #a78bfa;
+}
+
+/* ── Evo Page Layout ─────────────────────────────────────────────── */
+.evo-page {
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 0 16px 48px;
+}
+
+/* ── Evo Header ──────────────────────────────────────────────────── */
+.evo-header {
+  background: linear-gradient(135deg, rgba(45,16,96,0.97), rgba(15,5,32,0.99));
+  border: 2px solid var(--gold);
+  border-radius: 20px;
+  padding: 24px 20px 20px;
+  margin: 16px 0 22px;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+.evo-header::before {
+  content: '';
+  position: absolute; inset: 0;
+  background: radial-gradient(ellipse at 50% 0%, rgba(245,158,11,0.12), transparent 65%);
+  pointer-events: none;
+}
+.evo-header-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 14px;
+}
+.evo-title-block { flex: 1; text-align: left; }
+.evo-eyebrow {
+  font-family: var(--font-display);
+  font-size: 9px; letter-spacing: 4px;
+  color: var(--gold); margin-bottom: 4px;
+}
+.evo-title {
+  font-family: var(--font-display);
+  font-size: clamp(20px, 5vw, 30px);
+  font-weight: 900; color: var(--gold);
+  text-shadow: 0 0 20px rgba(245,158,11,0.5);
+  line-height: 1.1;
+}
+.evo-subtitle {
+  font-size: 12px; color: var(--text-gold);
+  margin-top: 3px; letter-spacing: 1px;
+}
+
+/* MIMO avatar in header */
+.mimo-avatar-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+.mimo-avatar {
+  width: 72px; height: 72px;
+  background: linear-gradient(135deg, rgba(107,33,168,0.6), rgba(45,16,96,0.9));
+  border: 2px solid var(--gold);
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 36px;
+  box-shadow: 0 0 18px rgba(245,158,11,0.3);
+  animation: float 3s ease-in-out infinite;
+  flex-shrink: 0;
+}
+.mimo-avatar-name {
+  font-family: var(--font-display);
+  font-size: 10px; color: var(--text-gold);
+  letter-spacing: 1px; text-align: center;
+}
+.mimo-avatar-stage {
+  font-size: 10px; color: var(--xp-color);
+  font-weight: 700;
+}
+
+/* XP evolution bar in header */
+.evo-xp-bar-section {
+  text-align: left;
+}
+.evo-xp-label {
+  display: flex;
+  justify-content: space-between;
+  font-size: 11px; color: var(--text-gold);
+  margin-bottom: 6px;
+}
+.evo-xp-label strong { color: var(--xp-color); }
+.evo-xp-track {
+  width: 100%; height: 10px;
+  background: rgba(107,33,168,0.3);
+  border-radius: 5px; overflow: hidden;
+  border: 1px solid rgba(107,33,168,0.5);
+}
+.evo-xp-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--purple-accent), var(--xp-color), var(--crystal-blue));
+  border-radius: 5px;
+  transition: width 0.9s cubic-bezier(0.34,1.56,0.64,1);
+  position: relative; overflow: hidden;
+}
+.evo-xp-fill::after {
+  content: '';
+  position: absolute; top: 0; left: -60%;
+  width: 40%; height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+  animation: shimmer 2.5s ease infinite;
+}
+.evo-xp-hint {
+  font-size: 11px; color: rgba(243,232,255,0.55);
+  margin-top: 6px; text-align: center;
+}
+
+/* Progress dots */
+.evo-progress-dots {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  margin-top: 14px;
+  flex-wrap: wrap;
+}
+.prog-dot {
+  width: 28px; height: 28px;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 11px; font-weight: 800;
+  font-family: var(--font-display);
+  flex-shrink: 0;
+  position: relative;
+  transition: transform 0.2s;
+}
+.prog-dot.done {
+  background: linear-gradient(135deg, var(--crystal-green), #059669);
+  color: white; border: none;
+  box-shadow: 0 0 8px rgba(52,211,153,0.5);
+}
+.prog-dot.active {
+  background: linear-gradient(135deg, var(--gold-dark), var(--gold));
+  color: var(--purple-dark); border: none;
+  box-shadow: 0 0 12px rgba(245,158,11,0.6);
+  animation: pulseBright 2s ease-in-out infinite;
+}
+.prog-dot.future {
+  background: rgba(107,33,168,0.25);
+  color: rgba(243,232,255,0.4);
+  border: 1px solid rgba(107,33,168,0.4);
+}
+.prog-dot-line {
+  flex: 1; height: 2px; min-width: 8px; max-width: 24px;
+  background: rgba(107,33,168,0.4);
+}
+.prog-dot-line.done { background: var(--crystal-green); }
+
+/* ── How it works strip ──────────────────────────────────────────── */
+.how-it-works {
+  background: rgba(45,16,96,0.5);
+  border: 1px solid rgba(245,158,11,0.25);
+  border-radius: 12px;
+  padding: 12px 16px;
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-bottom: 22px;
+}
+.hiw-step {
+  display: flex; align-items: center; gap: 6px;
+  font-size: 11px; color: var(--text-light);
+}
+.hiw-icon { font-size: 18px; flex-shrink: 0; }
+.hiw-sep { color: rgba(245,158,11,0.4); font-size: 16px; }
+
+/* ── Stage section ───────────────────────────────────────────────── */
+.stage-section {
+  margin-bottom: 20px;
+  opacity: 1;
+  transition: opacity 0.3s;
+}
+.stage-section.locked-section { opacity: 0.45; pointer-events: none; }
+
+.stage-header {
+  display: flex; align-items: center; gap: 10px;
+  margin-bottom: 12px;
+}
+.stage-badge {
+  background: linear-gradient(135deg, var(--purple-mid), var(--purple-dark));
+  border: 1px solid rgba(245,158,11,0.4);
+  border-radius: 10px;
+  padding: 6px 12px;
+  display: flex; align-items: center; gap: 7px;
+  flex-shrink: 0;
+}
+.stage-num {
+  font-family: var(--font-display);
+  font-size: 10px; color: var(--gold); letter-spacing: 2px;
+}
+.stage-name {
+  font-family: var(--font-display);
+  font-size: 13px; font-weight: 700; color: var(--gold);
+}
+.stage-icon { font-size: 16px; }
+.stage-locked-pill {
+  background: rgba(107,33,168,0.3);
+  border: 1px solid rgba(107,33,168,0.5);
+  border-radius: 12px;
+  padding: 3px 10px;
+  font-size: 10px;
+  color: rgba(243,232,255,0.5);
+  font-family: var(--font-display);
+  letter-spacing: 1px;
+  margin-left: auto;
+}
+.stage-chosen-pill {
+  background: rgba(52,211,153,0.2);
+  border: 1px solid rgba(52,211,153,0.5);
+  border-radius: 12px;
+  padding: 3px 10px;
+  font-size: 10px;
+  color: var(--crystal-green);
+  font-weight: 700;
+  margin-left: auto;
+}
+
+.stage-title-line {
+  font-family: var(--font-display);
+  font-size: 11px; letter-spacing: 3px;
+  color: rgba(253,230,138,0.7);
+  text-align: center;
+  margin: -4px 0 12px;
+  padding: 6px 0;
+  border-top: 1px solid rgba(245,158,11,0.15);
+  border-bottom: 1px solid rgba(245,158,11,0.15);
+}
+
+/* ── Choice grid ─────────────────────────────────────────────────── */
+.choice-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 12px;
+}
+.choice-grid.two-col { grid-template-columns: 1fr 1fr; }
+@media(max-width:480px) {
+  .choice-grid { grid-template-columns: 1fr; }
+  .choice-grid.two-col { grid-template-columns: 1fr; }
+}
+
+/* ── Choice card ─────────────────────────────────────────────────── */
+.choice-card {
+  background: linear-gradient(145deg, rgba(30,10,60,0.9), rgba(45,16,96,0.75));
+  border: 2px solid rgba(107,33,168,0.35);
+  border-radius: 14px;
+  padding: 16px;
+  cursor: pointer;
+  transition: transform 0.2s cubic-bezier(0.34,1.56,0.64,1),
+              border-color 0.2s, box-shadow 0.2s;
+  position: relative;
+  overflow: hidden;
+  user-select: none;
+}
+.choice-card::before {
+  content: '';
+  position: absolute; inset: 0;
+  opacity: 0; transition: opacity 0.2s;
+  border-radius: 12px;
+}
+.choice-card:hover {
+  transform: translateY(-4px) scale(1.02);
+}
+.choice-card.selected {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+}
+.choice-card.selected::after {
+  content: '✓';
+  position: absolute; top: 8px; right: 10px;
+  width: 22px; height: 22px;
+  background: var(--crystal-green);
+  color: white;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 900; font-size: 12px;
+  text-align: center; line-height: 22px;
+}
+
+.card-emoji-wrap {
+  width: 56px; height: 56px;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 28px;
+  margin: 0 auto 10px;
+  border: 2px solid rgba(245,158,11,0.3);
+  background: rgba(107,33,168,0.25);
+  transition: transform 0.2s;
+}
+.choice-card:hover .card-emoji-wrap {
+  transform: scale(1.15);
+}
+.choice-card.selected .card-emoji-wrap {
+  box-shadow: 0 0 14px currentColor;
+}
+
+.card-choice-name {
+  font-family: var(--font-display);
+  font-size: 14px; font-weight: 700;
+  text-align: center; margin-bottom: 2px;
+}
+.card-choice-subname {
+  font-size: 11px; text-align: center;
+  opacity: 0.75; margin-bottom: 8px;
+  font-style: italic;
+}
+.card-choice-tagline {
+  font-size: 11px; text-align: center;
+  font-weight: 700; margin-bottom: 5px;
+}
+.card-choice-desc {
+  font-size: 11px; text-align: center;
+  color: rgba(243,232,255,0.75); line-height: 1.5;
+}
+
+/* Objects row */
+.card-objects {
+  display: flex; gap: 6px; justify-content: center;
+  margin-top: 8px; flex-wrap: wrap;
+}
+.obj-chip {
+  background: rgba(107,33,168,0.3);
+  border: 1px solid rgba(107,33,168,0.5);
+  border-radius: 8px;
+  padding: 3px 8px;
+  font-size: 11px;
+  color: var(--text-gold);
+}
+
+/* ── Stage 0 — MIMO origin ──────────────────────────────────────── */
+.mimo-origin-card {
+  background: linear-gradient(145deg, rgba(45,16,96,0.9), rgba(15,5,32,0.95));
+  border: 2px solid var(--gold);
+  border-radius: 16px;
+  padding: 20px;
+  display: flex; align-items: center; gap: 16px;
+  flex-wrap: wrap;
+}
+.mimo-origin-emoji {
+  font-size: 52px;
+  animation: float 3s ease-in-out infinite;
+  flex-shrink: 0;
+}
+.mimo-origin-text h3 {
+  font-family: var(--font-display);
+  font-size: 18px; color: var(--gold);
+  margin-bottom: 4px;
+}
+.mimo-origin-text p {
+  font-size: 13px; color: var(--text-light);
+  line-height: 1.6;
+}
+
+/* ── MIMO display card (final summary) ──────────────────────────── */
+.mimo-summary {
+  background: linear-gradient(135deg, rgba(45,16,96,0.95), rgba(15,5,32,0.98));
+  border: 2px solid var(--gold);
+  border-radius: 16px;
+  padding: 22px;
+  text-align: center;
+  margin-bottom: 22px;
+}
+.mimo-summary .big-mimo { font-size: 64px; animation: float 3s ease-in-out infinite; }
+.mimo-summary h3 {
+  font-family: var(--font-display);
+  font-size: 20px; color: var(--gold);
+  margin: 10px 0 4px;
+  text-shadow: 0 0 14px rgba(245,158,11,0.5);
+}
+.mimo-summary .mimo-stage-label {
+  font-size: 12px; color: var(--xp-color);
+  font-weight: 700; letter-spacing: 2px;
+}
+.mimo-traits {
+  display: flex; gap: 8px; justify-content: center;
+  flex-wrap: wrap; margin-top: 12px;
+}
+.mimo-trait-chip {
+  background: rgba(107,33,168,0.35);
+  border: 1px solid rgba(107,33,168,0.5);
+  border-radius: 12px;
+  padding: 4px 10px;
+  font-size: 11px; color: var(--text-gold);
+  display: flex; align-items: center; gap: 4px;
+}
+
+/* ── Section divider ─────────────────────────────────────────────── */
+.section-divider {
+  text-align: center;
+  padding: 8px 0 16px;
+  font-size: 20px;
+  color: rgba(245,158,11,0.4);
+}
+
+/* ── Toast notification ──────────────────────────────────────────── */
+.evo-toast {
+  position: fixed;
+  bottom: 24px; left: 50%;
+  transform: translateX(-50%) translateY(20px);
+  background: linear-gradient(135deg, rgba(45,16,96,0.98), rgba(15,5,32,0.99));
+  border: 2px solid var(--gold);
+  border-radius: 14px;
+  padding: 14px 22px;
+  display: flex; align-items: center; gap: 10px;
+  font-size: 13px; font-weight: 700;
+  color: var(--text-light);
+  box-shadow: 0 8px 28px rgba(107,33,168,0.5);
+  z-index: 300;
+  opacity: 0;
+  transition: opacity 0.3s, transform 0.4s cubic-bezier(0.34,1.56,0.64,1);
+  max-width: min(90vw, 380px);
+  pointer-events: none;
+}
+.evo-toast.show {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+.evo-toast-icon { font-size: 22px; flex-shrink: 0; }
+
+/* ── Back button ─────────────────────────────────────────────────── */
+.btn-evo-back {
+  background: transparent;
+  color: var(--text-gold);
+  font-family: var(--font-display);
+  font-size: 12px; font-weight: 700;
+  border: 2px solid rgba(245,158,11,0.35);
+  border-radius: 10px;
+  padding: 10px 20px;
+  cursor: pointer;
+  transition: all 0.18s;
+  display: inline-flex; align-items: center; gap: 6px;
+  margin-bottom: 8px;
+}
+.btn-evo-back:hover { border-color: var(--gold); color: var(--gold); }
+
+/* ── Mini MIMO widget (for embedding in dashboard) ──────────────── */
+.mimo-mini-widget {
+  background: linear-gradient(135deg, rgba(45,16,96,0.9), rgba(15,5,32,0.95));
+  border: 2px solid rgba(245,158,11,0.35);
+  border-radius: 14px;
+  padding: 14px 16px;
+  display: flex; align-items: center; gap: 12px;
+  cursor: pointer;
+  transition: border-color 0.2s, box-shadow 0.2s, transform 0.2s;
+  margin-bottom: 18px;
+}
+.mimo-mini-widget:hover {
+  border-color: var(--gold);
+  box-shadow: 0 4px 18px rgba(245,158,11,0.2);
+  transform: translateY(-2px);
+}
+.mimo-mini-emoji { font-size: 36px; flex-shrink: 0; animation: float 3s ease-in-out infinite; }
+.mimo-mini-info { flex: 1; min-width: 0; }
+.mimo-mini-name {
+  font-family: var(--font-display);
+  font-size: 13px; font-weight: 700; color: var(--gold);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.mimo-mini-level { font-size: 11px; color: var(--xp-color); margin: 2px 0; font-weight: 700; }
+.mimo-mini-bar-track {
+  width: 100%; height: 5px;
+  background: rgba(107,33,168,0.3);
+  border-radius: 3px; overflow: hidden; margin-top: 4px;
+}
+.mimo-mini-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--purple-accent), var(--xp-color));
+  border-radius: 3px;
+  transition: width 0.7s ease;
+}
+.mimo-mini-btn {
+  background: linear-gradient(135deg, rgba(107,33,168,0.5), rgba(45,16,96,0.7));
+  border: 1px solid rgba(245,158,11,0.4);
+  border-radius: 8px;
+  padding: 7px 12px;
+  font-size: 11px; font-weight: 800;
+  color: var(--gold); font-family: var(--font-display);
+  white-space: nowrap; flex-shrink: 0;
+  transition: background 0.2s;
+}
+.mimo-mini-widget:hover .mimo-mini-btn {
+  background: linear-gradient(135deg, var(--gold-dark), var(--gold));
+  color: var(--purple-dark);
+}
+
+/* ── Animations reuse ────────────────────────────────────────────── */
+@keyframes float {
+  0%,100% { transform: translateY(0); }
+  50%      { transform: translateY(-8px); }
+}
+@keyframes shimmer {
+  0%   { transform: translateX(-100%); }
+  100% { transform: translateX(300%); }
+}
+@keyframes pulseBright {
+  0%,100% { box-shadow: 0 0 8px rgba(245,158,11,0.4); }
+  50%      { box-shadow: 0 0 22px rgba(245,158,11,0.8); }
+}
+@keyframes popIn {
+  0%  { transform: scale(0.7); opacity: 0; }
+  80% { transform: scale(1.06); }
+  100%{ transform: scale(1); opacity: 1; }
+}
+@keyframes slideUp {
+  from { transform: translateY(24px); opacity: 0; }
+  to   { transform: translateY(0);    opacity: 1; }
+}
+
+.animate-pop    { animation: popIn   0.4s cubic-bezier(0.34,1.56,0.64,1); }
+.animate-slide  { animation: slideUp 0.35s ease forwards; }
+
+/* ── Responsive ──────────────────────────────────────────────────── */
+@media(max-width:580px) {
+  .evo-header-top { flex-direction: column; align-items: center; }
+  .evo-title-block { text-align: center; }
+  .mimo-avatar-wrap { order: -1; }
+  .mimo-origin-card { flex-direction: column; text-align: center; }
+}
