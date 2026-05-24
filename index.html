@@ -12,9 +12,13 @@
   <link rel="manifest" href="/manifest.json">
   <link rel="apple-touch-icon" href="/assets/icons/icon-192.png">
   <link rel="icon" type="image/png" href="/assets/icons/icon-192.png">
-  <link rel="stylesheet" href="./styles/main.css">
-  <link rel="stylesheet" href="./styles/animations.css">
-  <link rel="stylesheet" href="./styles/evolution.css">
+  <!-- V2 styles (unchanged) -->
+  <link rel="stylesheet" href="/styles/main.css">
+  <link rel="stylesheet" href="/styles/animations.css">
+  <!-- V3 evolution styles -->
+  <link rel="stylesheet" href="/styles/evolution.css">
+  <!-- V3.6 Mimo companion styles -->
+  <link rel="stylesheet" href="/styles/mimo.css">
 </head>
 <body>
 
@@ -79,10 +83,9 @@
 <!-- ══════════════ INDEX SCREEN ══════════════ -->
 <div id="screen-index" class="screen">
 
-  <!-- Student hero -->
   <div class="student-hero">
-    <div class="greeting" id="student-greeting">Bem-vinda de volta,</div>
-    <div class="student-name" id="student-display-name"></div>
+    <div class="greeting"      id="student-greeting">Bem-vinda de volta,</div>
+    <div class="student-name"  id="student-display-name"></div>
     <div class="student-class" id="student-class"></div>
   </div>
 
@@ -106,20 +109,20 @@
     <div class="badges-row" id="badges-row"></div>
   </div>
 
-  <!-- ▼▼▼ V3: MIMO WIDGET SLOT ▼▼▼ -->
+  <!-- Mimo evolution widget slot -->
   <div style="padding:0 16px;">
     <div id="mimo-widget-slot"></div>
   </div>
-  <!-- ▲▲▲ END V3 SLOT ▲▲▲ -->
 
-  <!-- Activities grid -->
+  <!-- Activities -->
   <div style="padding:0 16px;">
     <div class="index-section-title">SUAS MISSÕES</div>
     <div class="activities-grid" id="activities-grid"></div>
   </div>
 
-  <!-- Footer -->
-  <div style="text-align:center;padding:28px 16px 12px;font-family:'Cinzel',serif;font-size:11px;color:rgba(245,158,11,0.55);letter-spacing:2px;">
+  <div style="text-align:center;padding:28px 16px 12px;
+    font-family:'Cinzel',serif;font-size:11px;
+    color:rgba(245,158,11,0.55);letter-spacing:2px;">
     ✦ A Jornada está apenas começando... ✦<br>
     Cada atividade é uma nova missão. Você está pronta?
   </div>
@@ -135,8 +138,8 @@
   <div class="celebration-box">
     <span class="celebration-emoji" id="cel-emoji">🏆</span>
     <div class="celebration-title" id="cel-title">Parabéns!</div>
-    <div class="celebration-msg" id="cel-msg"></div>
-    <div class="result-badges" id="cel-badges" style="display:none;"></div>
+    <div class="celebration-msg"   id="cel-msg"></div>
+    <div class="result-badges"     id="cel-badges" style="display:none;"></div>
     <button class="btn-celebration" id="cel-close">✦ Continuar Jornada ✦</button>
   </div>
 </div>
@@ -150,23 +153,25 @@
 <!-- ══════════════ INSTALL PROMPT ══════════════ -->
 <div class="install-prompt" id="install-prompt">
   <p>📲 Instale a <strong>Academia das Questões</strong> no seu celular para acessar offline!</p>
-  <button class="btn-install" id="btn-install">Instalar</button>
-  <button class="btn-dismiss" id="btn-dismiss">✕</button>
+  <button class="btn-install"  id="btn-install">Instalar</button>
+  <button class="btn-dismiss"  id="btn-dismiss">✕</button>
 </div>
 
 <!-- ══════════════ SCRIPTS ══════════════ -->
-<!-- Core V2 (unchanged) -->
-<script src="./scripts/data.js"></script>
-<script src="./scripts/db.js"></script>
-<script src="./scripts/auth.js"></script>
-<script src="./scripts/gamification.js"></script>
-<script src="./scripts/ui.js"></script>
-<!-- V3: Evolution system -->
-<script src="./scripts/evolution_data.js"></script>
-<script src="./scripts/evolution_db.js"></script>
-<script src="./scripts/evolution_widget.js"></script>
-<!-- App controller (V3 patched) -->
-<script src="./scripts/app.js"></script>
+<!-- V2 core (unchanged) -->
+<script src="/scripts/data.js"></script>
+<script src="/scripts/db.js"></script>
+<script src="/scripts/auth.js"></script>
+<script src="/scripts/gamification.js"></script>
+<script src="/scripts/ui.js"></script>
+<!-- V3 evolution system -->
+<script src="/scripts/evolution_data.js"></script>
+<script src="/scripts/evolution_db.js"></script>
+<script src="/scripts/evolution_widget.js"></script>
+<!-- V3.6 Mimo companion -->
+<script src="/scripts/mimo.js"></script>
+<!-- App controller (V3.6 patched) -->
+<script src="/scripts/app.js"></script>
 
 </body>
 </html>

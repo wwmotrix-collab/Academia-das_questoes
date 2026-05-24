@@ -1,11 +1,7 @@
-// ═══════════════════════════════════════════════════════════════════
-// Academia das Questões V3 — App.js Patch
-// Integra o sistema evolutivo sem quebrar nada do V2
-//
-// COMO APLICAR:
-// Substitua o conteúdo de /scripts/app.js pelo código abaixo,
-// ou adicione os blocos marcados com "V3 PATCH" no app.js existente.
-// ═══════════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════════
+// Academia das Questões V3.6 — App Controller
+// Integra Mimo companion sem quebrar nada do V3.5
+// ═══════════════════════════════════════════════════════════════
 
 const App = {
   _currentActivityId: null,
@@ -19,6 +15,9 @@ const App = {
     App._initOnlineDetection();
     Gamification.initParticles();
 
+    // ── V3.6: Mount Mimo immediately (before auth) ───────────
+    Mimo.mount();
+
     try {
       const loggedIn = await Auth.tryAutoLogin();
       if (loggedIn) {
@@ -27,6 +26,8 @@ const App = {
       } else {
         UI.showLoading(false);
         UI.showScreen('screen-login');
+        // Friendly greeting on login screen
+        setTimeout(() => Mimo.getMimoTip('welcome'), 1200);
       }
     } catch (e) {
       console.error('Init error', e);
@@ -36,13 +37,12 @@ const App = {
 
     document.getElementById('login-form')?.addEventListener('submit', App.handleLogin);
     document.getElementById('btn-logout')?.addEventListener('click', App.handleLogout);
-
     navigator.serviceWorker?.addEventListener('message', e => {
       if (e.data?.type === 'SYNC_RESULTS') App._syncPendingData();
     });
   },
 
-  // ── Login handler ────────────────────────────────────────────
+  // ── Login ────────────────────────────────────────────────────
   async handleLogin(e) {
     e.preventDefault();
     const name      = document.getElementById('login-name')?.value  || '';
@@ -59,6 +59,9 @@ const App = {
     } catch (err) {
       errEl.textContent = err.message || 'Erro ao entrar. Verifique sua conexão.';
       errEl.classList.add('show');
+      // ── V3.6: Mimo reacts to login error ────────────────────
+      Mimo.worry();
+      showMimoMessage('Hmm... parece que deu um problema. <em>Tenta de novo!</em>', '⚠️', 'ERRO');
     } finally {
       btnEl.textContent = '✦ Entrar na Academia ✦';
       btnEl.disabled    = false;
@@ -84,7 +87,17 @@ const App = {
           `Olá, <strong>${student.name}</strong>! Sua jornada começa agora. Complete atividades, evolua o seu Mimo e torne-se uma <strong>Mestra das Questões</strong>!`,
           '🎓', [], null
         );
+        // ── V3.6: Mimo greets new student ──────────────────────
+        setTimeout(() => {
+          showMimoMessage(
+            `Oi, <em>${student.name}</em>! Sou o <strong>Mimo</strong>! Estou aqui para te acompanhar. Complete atividades e me ajude a evoluir! 💜`,
+            '🐱', 'MIMO', 7000
+          );
+        }, 1500);
       }, 600);
+    } else {
+      // ── V3.6: Welcome back message ──────────────────────────
+      setTimeout(() => Mimo.onWelcome(), 1000);
     }
   },
 
@@ -103,10 +116,17 @@ const App = {
     UI.showScreen('screen-index');
     App._currentActivityId = null;
 
-    // ── V3 PATCH: inject + load MIMO widget ──────────────────
+    // ── V3.6: Remove activity-open class ────────────────────────
+    Mimo.setActivityScreen(false);
+
+    // Load evolution widget
     injectMimoWidgetSlot();
     await EvoWidget.init(student);
-    // ── END V3 PATCH ─────────────────────────────────────────
+
+    // ── V3.6: Update Mimo form from evolution ────────────────────
+    if (EvoWidget.currentEvo) {
+      Mimo.updateMimoForm(EvoWidget.currentEvo);
+    }
 
     if (App._isOnline) {
       try { await DB.processSyncQueue(student.id); } catch {}
@@ -126,6 +146,14 @@ const App = {
 
     UI.renderActivity(act, savedAnswers, isFinished, savedResult);
     UI.showScreen('screen-activity');
+
+    // ── V3.6: Mimo reacts to activity open ──────────────────────
+    Mimo.setActivityScreen(true);
+    if (!isFinished) {
+      setTimeout(() => Mimo.onActivityStart(), 800);
+    } else {
+      setTimeout(() => Mimo.getMimoTip('encouragement'), 800);
+    }
   },
 
   // ── Select MC option ─────────────────────────────────────────
@@ -153,13 +181,35 @@ const App = {
 
   // ── Finish activity ──────────────────────────────────────────
   async finishActivity(actId) {
+    // ── V3.6: Check for unanswered questions before confirming ──
+    const act     = ACTIVITIES.find(a => a.id === actId);
+    const answers = LS.get('answers_' + actId) || {};
+    if (act) {
+      let unanswered = 0;
+      act.questions.forEach((q, qi) => {
+        if (q.type === 'mc' && answers[qi] === undefined) unanswered++;
+        if (q.type === 'tf') {
+          const saved = answers[qi] || {};
+          q.tfItems?.forEach((_, ii) => { if (saved[ii] === undefined) unanswered++; });
+        }
+      });
+      if (unanswered > 0) {
+        Mimo.onIncomplete();
+        showMimoMessage(
+          `Você ainda tem <em>${unanswered} questão(ões)</em> sem resposta! Confere antes de concluir, tá?`,
+          '⚠️', 'ATENÇÃO!', 6000
+        );
+        if (!confirm(`Ainda há ${unanswered} questão(ões) sem resposta. Deseja concluir mesmo assim?`)) return;
+      } else {
+        // ── V3.6: Mimo encourages before confirm ────────────────
+        Mimo.onBeforeFinish();
+      }
+    }
+
     if (!confirm('Deseja concluir a atividade? As respostas serão corrigidas.')) return;
 
-    const act     = ACTIVITIES.find(a => a.id === actId);
     const student = Auth.student;
     if (!act || !student) return;
-
-    const answers = LS.get('answers_' + actId) || {};
 
     // Score
     let score = 0;
@@ -185,7 +235,6 @@ const App = {
     await DB.updateStudentXP(student.id, newTotalXP, newRankLabel);
     Auth.currentStudent = { ...student, total_xp: newTotalXP, current_rank: newRankLabel };
     LS.set('student', Auth.currentStudent);
-
     UI.showSync('online', '✓ Salvo!');
 
     const resultMap = LS.get('resultMap') || {};
@@ -195,26 +244,42 @@ const App = {
     };
     LS.set('resultMap', resultMap);
 
-    const results      = await DB.getResults(student.id);
+    const results        = await DB.getResults(student.id);
     const completedCount = results.length;
-    const newBadges    = await Gamification.checkBadges(
+    const newBadges      = await Gamification.checkBadges(
       student.id, completedCount, actId, score, act.maxScore, newTotalXP
     );
     await DB.getBadges(student.id);
 
-    // ── V3 PATCH: add XP to evolution + check stage unlock ───
-    let evoLevelUp    = false;
-    let newEvoStage   = null;
+    // Evolution XP
+    let evoLevelUp  = false;
+    let newEvoStage = null;
     try {
       const evoResult = await EvoWidget.onActivityComplete(student.id, xpEarned);
       evoLevelUp = evoResult.levelUp;
-
-      // Check if a new evolution stage was unlocked
       newEvoStage = await EvoWidget.checkStageUnlock(student.id);
+
+      // ── V3.6: Update Mimo form after activity ────────────────
+      if (EvoWidget.currentEvo) {
+        Mimo.updateMimoForm(EvoWidget.currentEvo);
+      }
     } catch (e) {
-      console.warn('Evolution update error (non-critical):', e);
+      console.warn('Evolution update error:', e);
     }
-    // ── END V3 PATCH ─────────────────────────────────────────
+
+    // ── V3.6: Mimo celebrates completion ────────────────────────
+    setTimeout(() => {
+      Mimo.onActivityComplete();
+      const pct = Math.round(score / act.maxScore * 100);
+      if (pct === 100) {
+        setTimeout(() => showMimoMessage(
+          '<em>100% de acertos!!</em> Você é absolutamente INCRÍVEL! 🏆 Minha evolução agradece!',
+          '🏆', 'PERFEITO!', 7000
+        ), 1000);
+      } else if (newEvoStage) {
+        setTimeout(() => Mimo.onEvolutionUnlock(), 1500);
+      }
+    }, 600);
 
     // XP flash
     setTimeout(() => {
@@ -232,25 +297,21 @@ const App = {
       ? `🎊 Você subiu para <strong>${newRankLabel}</strong>!`
       : `Você ganhou <strong>+${xpEarned} XP</strong>! Total: <strong>${newTotalXP} XP</strong>`;
 
-    // ── V3 PATCH: enrich celebration with evo info ───────────
     let evoMsg = '';
     if (evoLevelUp) {
       const evo = EvoWidget.currentEvo;
-      evoMsg = `<br><br>⭐ <strong>Seu Mimo evoluiu para o Nível ${evo?.evolution_level}!</strong>`;
+      evoMsg = `<br><br>⭐ <strong>Mimo evoluiu para o Nível ${evo?.evolution_level}!</strong>`;
     }
     if (newEvoStage) {
-      evoMsg += `<br>🌟 <strong>Estágio ${newEvoStage.stage} desbloqueado: ${newEvoStage.stageInfo.name}!</strong> Visite a Árvore Evolutiva para fazer sua escolha!`;
+      evoMsg += `<br>🌟 <strong>Estágio ${newEvoStage.stage} desbloqueado!</strong> Visite a Árvore Evolutiva!`;
     }
-    // ── END V3 PATCH ─────────────────────────────────────────
 
     const pct        = Math.round(score / act.maxScore * 100);
     const celebEmoji = pct === 100 ? '🏆' : pct >= 75 ? '⭐' : pct >= 50 ? '💎' : '📘';
     const celebTitle = pct === 100 ? 'Atividade Perfeita!' : pct >= 75 ? 'Excelente resultado!' : pct >= 50 ? 'Boa missão, heroína!' : 'Missão concluída!';
 
-    // Add evo button to new badges if stage unlocked
     const extraBadges = newEvoStage
-      ? [{ icon: '🌟', name: 'Novo Estágio Desbloqueado!' }]
-      : [];
+      ? [{ icon: '🌟', name: 'Novo Estágio Desbloqueado!' }] : [];
 
     setTimeout(() => {
       Gamification.showCelebration(
@@ -263,9 +324,9 @@ const App = {
     }, 500);
   },
 
-  // ── Redo activity ────────────────────────────────────────────
+  // ── Redo ─────────────────────────────────────────────────────
   redoActivity(actId) {
-    if (!confirm('Deseja refazer a atividade? Seu resultado anterior será mantido, mas as respostas serão apagadas.')) return;
+    if (!confirm('Deseja refazer a atividade?')) return;
     LS.remove('answers_' + actId);
     const resultMap = LS.get('resultMap') || {};
     delete resultMap[actId];
@@ -280,7 +341,9 @@ const App = {
     document.getElementById('app-header').style.display = 'none';
     document.getElementById('login-name').value  = '';
     document.getElementById('login-class').value = '';
-    UI.showScreen('screen-login');
+    // ── V3.6: Mimo says goodbye ─────────────────────────────────
+    showMimoMessage('Até logo, heroína! <em>Volte logo para continuarmos!</em> 💜', '👋', 'TCHAU!', 4000);
+    setTimeout(() => UI.showScreen('screen-login'), 300);
   },
 
   // ── PWA ──────────────────────────────────────────────────────
@@ -295,7 +358,6 @@ const App = {
     });
   },
 
-  // ── Online/offline ───────────────────────────────────────────
   _initOnlineDetection() {
     window.addEventListener('online', () => {
       App._isOnline = true;
@@ -310,6 +372,7 @@ const App = {
     window.addEventListener('offline', () => {
       App._isOnline = false;
       UI.showSync('offline', '⚡ Modo offline');
+      showMimoMessage('Parece que ficamos <em>offline</em>. Não se preocupa, continua aqui! Vou guardar tudo direitinho. 💜', '📡', 'OFFLINE', 6000);
     });
   },
 
@@ -321,5 +384,4 @@ const App = {
   },
 };
 
-// Boot
 document.addEventListener('DOMContentLoaded', App.init);

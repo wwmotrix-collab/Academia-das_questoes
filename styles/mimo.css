@@ -1,0 +1,353 @@
+/* ═══════════════════════════════════════════════════════════════
+   Academia das Questões V3.6 — Mimo Companion CSS
+   Mascote flutuante com balão de fala, responsivo, sem atrapalhar
+   ═══════════════════════════════════════════════════════════════ */
+
+/* ── Variables ── */
+:root {
+  --mimo-size-desktop: 110px;
+  --mimo-size-mobile:  76px;
+  --bubble-bg:         rgba(15, 5, 32, 0.96);
+  --bubble-border:     rgba(245, 158, 11, 0.55);
+  --bubble-shadow:     0 8px 32px rgba(107, 33, 168, 0.45);
+  --mimo-glow-base:    rgba(196, 181, 253, 0.55);
+  --mimo-glow-mammal:  rgba(245, 158, 11, 0.55);
+  --mimo-glow-reptile: rgba(52,  211, 153, 0.55);
+  --mimo-glow-bird:    rgba(96,  165, 250, 0.55);
+  --mimo-z:            150;
+  --mimo-transition:   0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   COMPANION WRAPPER
+   ═══════════════════════════════════════════════════════════════ */
+#mimo-companion {
+  position: fixed;
+  right: 18px;
+  bottom: 24px;
+  z-index: var(--mimo-z);
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 8px;
+  pointer-events: none; /* children handle their own events */
+}
+
+/* ── Entrance animation ── */
+#mimo-companion {
+  animation: mimoEntrance 0.7s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+@keyframes mimoEntrance {
+  from { transform: translateY(80px) scale(0.6); opacity: 0; }
+  to   { transform: translateY(0)    scale(1);   opacity: 1; }
+}
+
+/* ── Minimised state ── */
+#mimo-companion.minimised .mimo-bubble-wrap,
+#mimo-companion.minimised .mimo-bubble-wrap * {
+  display: none !important;
+}
+#mimo-companion.minimised .mimo-avatar-wrap {
+  transform: scale(0.72);
+  opacity: 0.7;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   SPEECH BUBBLE
+   ═══════════════════════════════════════════════════════════════ */
+.mimo-bubble-wrap {
+  max-width: min(280px, 72vw);
+  position: relative;
+  pointer-events: auto;
+  transform-origin: bottom right;
+  animation: bubblePop 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+@keyframes bubblePop {
+  from { transform: scale(0.6) translateY(12px); opacity: 0; }
+  to   { transform: scale(1)   translateY(0);    opacity: 1; }
+}
+.mimo-bubble-wrap.hiding {
+  animation: bubbleFade 0.25s ease forwards;
+}
+@keyframes bubbleFade {
+  to { transform: scale(0.8) translateY(8px); opacity: 0; }
+}
+
+.mimo-bubble {
+  background: var(--bubble-bg);
+  border: 1.5px solid var(--bubble-border);
+  border-radius: 16px 16px 4px 16px;
+  padding: 11px 14px 10px;
+  box-shadow: var(--bubble-shadow),
+              inset 0 1px 0 rgba(245, 158, 11, 0.1);
+  position: relative;
+}
+
+/* Tail pointing down-right */
+.mimo-bubble::after {
+  content: '';
+  position: absolute;
+  bottom: -10px; right: 22px;
+  width: 0; height: 0;
+  border-left:  10px solid transparent;
+  border-right:  0px solid transparent;
+  border-top:   10px solid rgba(245, 158, 11, 0.55);
+}
+.mimo-bubble::before {
+  content: '';
+  position: absolute;
+  bottom: -8px; right: 23px;
+  width: 0; height: 0;
+  border-left:  9px solid transparent;
+  border-right:  0px solid transparent;
+  border-top:   9px solid var(--bubble-bg);
+  z-index: 1;
+}
+
+/* Bubble text */
+.mimo-bubble-text {
+  font-family: 'Nunito', sans-serif;
+  font-size: 12.5px;
+  font-weight: 700;
+  color: #f3e8ff;
+  line-height: 1.55;
+  margin: 0;
+}
+.mimo-bubble-text em {
+  color: #fde68a;
+  font-style: normal;
+  font-weight: 800;
+}
+.mimo-bubble-text strong {
+  color: #a78bfa;
+}
+
+/* Close button on bubble */
+.mimo-bubble-close {
+  position: absolute;
+  top: -7px; right: -7px;
+  width: 20px; height: 20px;
+  background: rgba(107, 33, 168, 0.9);
+  border: 1px solid rgba(245, 158, 11, 0.5);
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 10px; color: #fde68a;
+  cursor: pointer; line-height: 1;
+  transition: background 0.15s;
+  pointer-events: auto;
+}
+.mimo-bubble-close:hover { background: rgba(220, 38, 38, 0.7); }
+
+/* Context icon strip */
+.mimo-bubble-context {
+  display: flex; align-items: center; gap: 5px;
+  margin-bottom: 5px;
+}
+.mimo-context-icon {
+  font-size: 14px;
+  flex-shrink: 0;
+}
+.mimo-context-label {
+  font-family: 'Cinzel', serif;
+  font-size: 8px; letter-spacing: 2px;
+  color: rgba(253, 230, 138, 0.65);
+  text-transform: uppercase;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   AVATAR SECTION
+   ═══════════════════════════════════════════════════════════════ */
+.mimo-avatar-wrap {
+  position: relative;
+  width: var(--mimo-size-desktop);
+  height: var(--mimo-size-desktop);
+  cursor: pointer;
+  pointer-events: auto;
+  transition: transform var(--mimo-transition);
+  flex-shrink: 0;
+  align-self: flex-end;
+}
+.mimo-avatar-wrap:hover { transform: scale(1.08) translateY(-4px); }
+.mimo-avatar-wrap:active { transform: scale(0.95); }
+
+/* The actual image */
+.mimo-img {
+  width: 100%; height: 100%;
+  object-fit: contain;
+  filter: drop-shadow(0 4px 16px var(--mimo-glow-base));
+  transition: filter 0.5s ease;
+  display: block;
+}
+
+/* Glow ring behind mascot */
+.mimo-glow-ring {
+  position: absolute;
+  inset: -6px;
+  border-radius: 50%;
+  background: radial-gradient(circle, var(--mimo-glow-base) 0%, transparent 70%);
+  opacity: 0.5;
+  animation: mimoPulse 3s ease-in-out infinite;
+  pointer-events: none;
+}
+
+/* Class-specific glow colours */
+#mimo-companion[data-class="mamifero"] .mimo-img     { filter: drop-shadow(0 4px 16px var(--mimo-glow-mammal)); }
+#mimo-companion[data-class="mamifero"] .mimo-glow-ring { background: radial-gradient(circle, var(--mimo-glow-mammal) 0%, transparent 70%); }
+#mimo-companion[data-class="reptil"]   .mimo-img     { filter: drop-shadow(0 4px 16px var(--mimo-glow-reptile)); }
+#mimo-companion[data-class="reptil"]   .mimo-glow-ring { background: radial-gradient(circle, var(--mimo-glow-reptile) 0%, transparent 70%); }
+#mimo-companion[data-class="ave"]      .mimo-img     { filter: drop-shadow(0 4px 16px var(--mimo-glow-bird)); }
+#mimo-companion[data-class="ave"]      .mimo-glow-ring { background: radial-gradient(circle, var(--mimo-glow-bird) 0%, transparent 70%); }
+
+/* Float animation */
+.mimo-avatar-wrap {
+  animation: mimoFloat 3.8s ease-in-out infinite;
+}
+@keyframes mimoFloat {
+  0%, 100% { transform: translateY(0);    }
+  50%       { transform: translateY(-9px); }
+}
+.mimo-avatar-wrap:hover {
+  animation-play-state: paused;
+  transform: scale(1.08) translateY(-4px);
+}
+
+@keyframes mimoPulse {
+  0%, 100% { opacity: 0.35; transform: scale(1);    }
+  50%       { opacity: 0.65; transform: scale(1.12); }
+}
+
+/* Minimise toggle button */
+.mimo-toggle-btn {
+  position: absolute;
+  top: -4px; left: -4px;
+  width: 22px; height: 22px;
+  background: rgba(15, 5, 32, 0.9);
+  border: 1px solid rgba(245, 158, 11, 0.5);
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 10px; color: #fde68a;
+  cursor: pointer;
+  transition: background 0.15s, transform 0.15s;
+  pointer-events: auto;
+  z-index: 2;
+}
+.mimo-toggle-btn:hover { background: rgba(107, 33, 168, 0.9); transform: scale(1.15); }
+
+/* Restore pill (shown when minimised) */
+.mimo-restore-pill {
+  position: fixed;
+  right: 14px;
+  bottom: 14px;
+  z-index: var(--mimo-z);
+  display: none;
+  align-items: center;
+  gap: 7px;
+  background: linear-gradient(135deg, rgba(45,16,96,0.97), rgba(15,5,32,0.99));
+  border: 1.5px solid rgba(245,158,11,0.45);
+  border-radius: 30px;
+  padding: 7px 14px 7px 8px;
+  cursor: pointer;
+  pointer-events: auto;
+  box-shadow: 0 4px 18px rgba(107,33,168,0.4);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+.mimo-restore-pill:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 22px rgba(245,158,11,0.25);
+}
+.mimo-restore-pill.visible { display: flex; }
+.mimo-restore-img {
+  width: 32px; height: 32px;
+  object-fit: contain;
+  filter: drop-shadow(0 2px 6px rgba(196,181,253,0.6));
+}
+.mimo-restore-text {
+  font-family: 'Nunito', sans-serif;
+  font-size: 11px; font-weight: 800;
+  color: #fde68a;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   CELEBRATION BURST (shows on correct answer / completion)
+   ═══════════════════════════════════════════════════════════════ */
+.mimo-burst {
+  position: absolute;
+  inset: -16px;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: -1;
+  opacity: 0;
+}
+.mimo-burst.active {
+  animation: mimoBurst 0.7s ease forwards;
+}
+@keyframes mimoBurst {
+  0%   { opacity: 1;  transform: scale(0.8);  }
+  50%  { opacity: 0.6; transform: scale(1.4); }
+  100% { opacity: 0;   transform: scale(1.8); }
+}
+
+/* Happy bounce */
+.mimo-avatar-wrap.happy {
+  animation: mimoHappy 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) 2;
+}
+@keyframes mimoHappy {
+  0%   { transform: translateY(0)    scale(1);    }
+  40%  { transform: translateY(-18px) scale(1.1); }
+  70%  { transform: translateY(-4px)  scale(0.97); }
+  100% { transform: translateY(0)    scale(1);    }
+}
+
+/* Worry shake */
+.mimo-avatar-wrap.worried {
+  animation: mimoWorry 0.4s ease 2;
+}
+@keyframes mimoWorry {
+  0%, 100% { transform: translateX(0); }
+  25%       { transform: translateX(-6px) rotate(-4deg); }
+  75%       { transform: translateX( 6px) rotate( 4deg); }
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   FALLBACK (no image)
+   ═══════════════════════════════════════════════════════════════ */
+.mimo-fallback {
+  width: 100%; height: 100%;
+  display: flex; align-items: center; justify-content: center;
+  background: linear-gradient(135deg, rgba(107,33,168,0.4), rgba(45,16,96,0.7));
+  border-radius: 50%;
+  border: 2px solid rgba(245,158,11,0.4);
+  font-size: 36px;
+  box-shadow: 0 0 20px rgba(196,181,253,0.4);
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   MOBILE — compact positioning
+   ═══════════════════════════════════════════════════════════════ */
+@media (max-width: 600px) {
+  :root {
+    --mimo-size-desktop: 76px;
+  }
+  #mimo-companion {
+    right: 10px;
+    bottom: 16px;
+  }
+  .mimo-bubble-wrap { max-width: min(230px, 78vw); }
+  .mimo-bubble      { padding: 9px 12px 8px; }
+  .mimo-bubble-text { font-size: 11.5px; }
+}
+
+/* Tall screens — push up if floating above nav */
+@media (max-height: 700px) {
+  #mimo-companion { bottom: 10px; }
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   ACTIVITY SCREEN: position slightly higher to avoid submit button
+   ═══════════════════════════════════════════════════════════════ */
+body.activity-open #mimo-companion {
+  bottom: 90px;
+}
+@media (max-width: 600px) {
+  body.activity-open #mimo-companion { bottom: 74px; }
+}

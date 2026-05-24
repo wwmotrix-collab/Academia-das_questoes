@@ -1,8 +1,8 @@
 // ═══════════════════════════════════════════════════════
-// Academia das Questões V3 — Service Worker
+// Academia das Questões V3.6 — Service Worker
 // ═══════════════════════════════════════════════════════
 
-const CACHE_NAME = 'academia-v3-cache-v1';
+const CACHE_NAME = 'academia-v36-cache-v1';
 const STATIC_ASSETS = [
   '/',
   '/index.html',
@@ -10,6 +10,7 @@ const STATIC_ASSETS = [
   '/styles/main.css',
   '/styles/animations.css',
   '/styles/evolution.css',
+  '/styles/mimo.css',
   '/scripts/data.js',
   '/scripts/db.js',
   '/scripts/auth.js',
@@ -18,8 +19,13 @@ const STATIC_ASSETS = [
   '/scripts/evolution_data.js',
   '/scripts/evolution_db.js',
   '/scripts/evolution_widget.js',
+  '/scripts/mimo.js',
   '/scripts/app.js',
   '/manifest.json',
+  '/assets/mascots/mimo-base.webp',
+  '/assets/mascots/mimo-mammal.webp',
+  '/assets/mascots/mimo-reptile.webp',
+  '/assets/mascots/mimo-bird.webp',
 ];
 
 self.addEventListener('install', event => {
@@ -32,9 +38,9 @@ self.addEventListener('install', event => {
 
 self.addEventListener('activate', event => {
   event.waitUntil(
-    caches.keys().then(keys =>
-      Promise.all(keys.filter(k => k !== CACHE_NAME).map(k => caches.delete(k)))
-    ).then(() => self.clients.claim())
+    caches.keys()
+      .then(keys => Promise.all(keys.filter(k => k !== CACHE_NAME).map(k => caches.delete(k))))
+      .then(() => self.clients.claim())
   );
 });
 
@@ -53,7 +59,7 @@ self.addEventListener('fetch', event => {
     return;
   }
 
-  // Google Fonts — cache first
+  // Fonts — cache first
   if (url.hostname.includes('fonts.googleapis.com') || url.hostname.includes('fonts.gstatic.com')) {
     event.respondWith(
       caches.match(event.request).then(cached =>
@@ -67,7 +73,7 @@ self.addEventListener('fetch', event => {
     return;
   }
 
-  // Static — cache first
+  // Everything else — cache first
   event.respondWith(
     caches.match(event.request).then(cached => {
       if (cached) return cached;
