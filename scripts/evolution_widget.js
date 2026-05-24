@@ -96,3 +96,12 @@ function injectMimoWidgetSlot() {
   slot.id = 'mimo-widget-slot';
   grid.parentElement.insertBefore(slot, grid);
 }
+
+window.EvoWidget = window.EvoWidget || {
+  init: function () {
+    console.warn("EvoWidget fallback ativo");
+  },
+  render: function () {},
+  update: function () {},
+  refresh: function () {}
+};
