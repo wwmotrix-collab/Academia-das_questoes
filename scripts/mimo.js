@@ -344,3 +344,7 @@ function minimizeMimo() {
 function restoreMimo() {
   Mimo.restoreMimo();
 }
+
+window.injectMimoWidgetSlot = window.injectMimoWidgetSlot || function () {
+  console.warn("injectMimoWidgetSlot fallback ativo");
+};
