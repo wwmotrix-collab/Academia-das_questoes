@@ -12,30 +12,28 @@
   <link rel="manifest" href="/manifest.json">
   <link rel="apple-touch-icon" href="/assets/icons/icon-192.png">
   <link rel="icon" type="image/png" href="/assets/icons/icon-192.png">
-  <!-- V2 styles (unchanged) -->
-  <link rel="stylesheet" href="./styles/main.css">
-  <link rel="stylesheet" href="./styles/animations.css">
+
+  <!-- V2 styles -->
+  <link rel="stylesheet" href="/styles/main.css">
+  <link rel="stylesheet" href="/styles/animations.css">
   <!-- V3 evolution styles -->
-  <link rel="stylesheet" href="./styles/evolution.css">
-  <!-- V3.6 Mimo companion styles -->
-  <link rel="stylesheet" href="./styles/mimo.css">
+  <link rel="stylesheet" href="/styles/evolution.css">
+  <!-- V3.7 Mimo (replaces mimo.css) -->
+  <link rel="stylesheet" href="/styles/mimo-evolution.css">
 </head>
 <body>
 
-<!-- ══════════════ PARTICLES ══════════════ -->
 <canvas id="particles-canvas"></canvas>
-
-<!-- ══════════════ CONFETTI ══════════════ -->
 <canvas id="confetti-canvas"></canvas>
 
-<!-- ══════════════ LOADING ══════════════ -->
+<!-- Loading -->
 <div class="loading-screen" id="loading-screen">
   <div class="loading-crystal animate-float">💎</div>
   <div class="loading-title">Academia das Questões</div>
   <div class="loading-bar"><div class="loading-fill"></div></div>
 </div>
 
-<!-- ══════════════ APP HEADER ══════════════ -->
+<!-- Header -->
 <header class="app-header" id="app-header" style="display:none;">
   <div class="header-logo">
     Academia das Questões
@@ -49,7 +47,7 @@
   <button class="btn-logout" id="btn-logout">Sair</button>
 </header>
 
-<!-- ══════════════ LOGIN SCREEN ══════════════ -->
+<!-- ══════ LOGIN ══════ -->
 <div id="screen-login" class="screen active">
   <div class="login-box">
     <div class="login-logo">
@@ -80,16 +78,14 @@
   </div>
 </div>
 
-<!-- ══════════════ INDEX SCREEN ══════════════ -->
+<!-- ══════ INDEX ══════ -->
 <div id="screen-index" class="screen">
-
   <div class="student-hero">
     <div class="greeting"      id="student-greeting">Bem-vinda de volta,</div>
     <div class="student-name"  id="student-display-name"></div>
     <div class="student-class" id="student-class"></div>
   </div>
 
-  <!-- XP / Rank / Progress panel -->
   <div class="progress-panel" style="margin:0 16px 18px;">
     <div class="progress-top">
       <div class="xp-display">
@@ -114,7 +110,6 @@
     <div id="mimo-widget-slot"></div>
   </div>
 
-  <!-- Activities -->
   <div style="padding:0 16px;">
     <div class="index-section-title">SUAS MISSÕES</div>
     <div class="activities-grid" id="activities-grid"></div>
@@ -122,18 +117,16 @@
 
   <div style="text-align:center;padding:28px 16px 12px;
     font-family:'Cinzel',serif;font-size:11px;
-    color:rgba(245,158,11,0.55);letter-spacing:2px;">
+    color:rgba(245,158,11,.55);letter-spacing:2px;">
     ✦ A Jornada está apenas começando... ✦<br>
     Cada atividade é uma nova missão. Você está pronta?
   </div>
 </div>
 
-<!-- ══════════════ ACTIVITY SCREEN ══════════════ -->
-<div id="screen-activity" class="screen">
-  <!-- Content injected by UI.renderActivity() -->
-</div>
+<!-- ══════ ACTIVITY ══════ -->
+<div id="screen-activity" class="screen"></div>
 
-<!-- ══════════════ CELEBRATION OVERLAY ══════════════ -->
+<!-- ══════ CELEBRATION ══════ -->
 <div class="celebration-overlay" id="celebration-overlay">
   <div class="celebration-box">
     <span class="celebration-emoji" id="cel-emoji">🏆</span>
@@ -144,34 +137,37 @@
   </div>
 </div>
 
-<!-- ══════════════ SYNC INDICATOR ══════════════ -->
+<!-- ══════ SYNC INDICATOR ══════ -->
 <div class="sync-indicator" id="sync-indicator">
   <div class="sync-dot"></div>
   <span class="sync-text">Salvando...</span>
 </div>
 
-<!-- ══════════════ INSTALL PROMPT ══════════════ -->
+<!-- ══════ INSTALL PROMPT ══════ -->
 <div class="install-prompt" id="install-prompt">
-  <p>📲 Instale a <strong>Academia das Questões</strong> no seu celular para acessar offline!</p>
-  <button class="btn-install"  id="btn-install">Instalar</button>
-  <button class="btn-dismiss"  id="btn-dismiss">✕</button>
+  <p>📲 Instale a <strong>Academia das Questões</strong> no celular!</p>
+  <button class="btn-install" id="btn-install">Instalar</button>
+  <button class="btn-dismiss" id="btn-dismiss">✕</button>
 </div>
 
 <!-- ══════════════ SCRIPTS ══════════════ -->
-<!-- V2 core (unchanged) -->
-<script src="./scripts/data.js"></script>
-<script src="./scripts/db.js"></script>
-<script src="./scripts/auth.js"></script>
-<script src="./scripts/gamification.js"></script>
-<script src="./scripts/ui.js"></script>
-<!-- V3 evolution system -->
-<script src="./scripts/evolution_data.js"></script>
-<script src="./scripts/evolution_db.js"></script>
-<script src="./scripts/evolution_widget.js"></script>
-<!-- V3.6 Mimo companion -->
-<script src="./scripts/mimo.js"></script>
-<!-- App controller (V3.6 patched) -->
-<script src="./scripts/app.js"></script>
+<!-- V2 core — UNCHANGED, load first -->
+<script src="/scripts/data.js"></script>
+<script src="/scripts/db.js"></script>
+<script src="/scripts/auth.js"></script>
+<script src="/scripts/gamification.js"></script>
+<script src="/scripts/ui.js"></script>
+
+<!-- V3 evolution — load before app, guarded inside app.js -->
+<script src="/scripts/evolution_data.js"></script>
+<script src="/scripts/evolution_db.js"></script>
+<script src="/scripts/evolution_widget.js"></script>
+
+<!-- V3.7 Mimo (single file, replaces mimo.js + evolution trigger) -->
+<script src="/scripts/mimo-evolution.js"></script>
+
+<!-- App controller — must be LAST -->
+<script src="/scripts/app.js"></script>
 
 </body>
 </html>

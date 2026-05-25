@@ -4,49 +4,46 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <meta name="theme-color" content="#6b21a8">
-  <title>Árvore Evolutiva do Mimo — Academia das Questões</title>
+  <title>Árvore Evolutiva — Academia das Questões</title>
   <link rel="manifest" href="/manifest.json">
   <link rel="stylesheet" href="/styles/main.css">
   <link rel="stylesheet" href="/styles/animations.css">
   <link rel="stylesheet" href="/styles/evolution.css">
-  <!-- V3.6: Mimo companion on evolution page too -->
-  <link rel="stylesheet" href="/styles/mimo.css">
+  <link rel="stylesheet" href="/styles/mimo-evolution.css">
 </head>
 <body>
 
-<!-- ── App Header ── -->
 <header class="app-header" id="app-header" style="display:none;">
-  <div class="header-logo">
-    Academia das Questões
-    <span id="header-name"></span>
-  </div>
-  <div class="header-xp">
-    <span class="xp-icon">⚡</span>
-    <span id="header-xp">0</span> XP
-  </div>
+  <div class="header-logo">Academia das Questões<span id="header-name"></span></div>
+  <div class="header-xp"><span class="xp-icon">⚡</span><span id="header-xp">0</span> XP</div>
   <div class="header-rank" id="header-rank"></div>
   <button class="btn-logout" id="btn-logout">Sair</button>
 </header>
 
-<!-- ── Main Evolution Page ── -->
-<main class="evo-page" id="evo-page">
-
+<main class="evo-page">
   <div style="padding-top:16px;">
-    <button class="btn-evo-back" onclick="goBack()">← Voltar ao Início</button>
+    <button class="btn-evo-back" onclick="window.location.href='/'">← Voltar</button>
   </div>
 
-  <!-- Header: MIMO + XP + progress dots -->
-  <div class="evo-header" id="evo-header">
+  <div class="evo-header">
     <div class="evo-header-top">
       <div class="evo-title-block">
         <div class="evo-eyebrow">✦ ACADEMIA DAS QUESTÕES ✦</div>
         <div class="evo-title">Árvore Evolutiva<br><span id="evo-path-title">do Mimo</span></div>
         <div class="evo-subtitle">Cada escolha define o destino do seu Mimo!</div>
       </div>
-      <div class="mimo-avatar-wrap" style="cursor:default;animation:none;">
-        <div class="mimo-avatar" id="mimo-avatar-header">🐱</div>
-        <div class="mimo-avatar-name"  id="mimo-avatar-name">Mimo</div>
-        <div class="mimo-avatar-stage" id="mimo-avatar-stage">Estágio 0</div>
+      <div class="mimo-avatar-wrap" style="cursor:default;animation:none;pointer-events:none;">
+        <div class="mimo-avatar" id="evo-header-avatar" style="
+          width:72px;height:72px;background:linear-gradient(135deg,rgba(107,33,168,.6),rgba(45,16,96,.9));
+          border:2px solid rgba(245,158,11,.5);border-radius:50%;
+          display:flex;align-items:center;justify-content:center;overflow:hidden;
+          box-shadow:0 0 20px rgba(245,158,11,.3);">
+          <img id="evo-header-img" src="/assets/mascots/mimo-base.webp"
+               style="width:68px;height:68px;object-fit:contain;"
+               alt="Mimo" onerror="this.style.opacity='.3'">
+        </div>
+        <div style="font-family:'Cinzel',serif;font-size:10px;color:#fde68a;text-align:center;margin-top:4px;" id="evo-header-name">Mimo</div>
+        <div style="font-size:10px;color:#a78bfa;font-weight:700;text-align:center;" id="evo-header-stage">Estágio 0</div>
       </div>
     </div>
 
@@ -55,16 +52,13 @@
         <span>Progresso de Evolução</span>
         <strong id="evo-xp-pct">0%</strong>
       </div>
-      <div class="evo-xp-track">
-        <div class="evo-xp-fill" id="evo-xp-fill" style="width:0%"></div>
-      </div>
+      <div class="evo-xp-track"><div class="evo-xp-fill" id="evo-xp-fill" style="width:0%"></div></div>
       <div class="evo-xp-hint" id="evo-xp-hint">Complete atividades para evoluir!</div>
     </div>
 
     <div class="evo-progress-dots" id="evo-progress-dots"></div>
   </div>
 
-  <!-- How it works -->
   <div class="how-it-works">
     <div class="hiw-step"><span class="hiw-icon">📖</span><span>Estude</span></div>
     <span class="hiw-sep">›</span>
@@ -75,18 +69,15 @@
     <div class="hiw-step"><span class="hiw-icon">🌟</span><span>Evolua</span></div>
   </div>
 
-  <!-- Evolution stages -->
   <div id="stages-container"></div>
-
 </main>
 
-<!-- ── Toast ── -->
 <div class="evo-toast" id="evo-toast">
   <span class="evo-toast-icon" id="toast-icon">✨</span>
   <span id="toast-msg">Escolha salva!</span>
 </div>
 
-<!-- ── Scripts ── -->
+<!-- Scripts -->
 <script src="/scripts/data.js"></script>
 <script src="/scripts/db.js"></script>
 <script src="/scripts/auth.js"></script>
@@ -94,280 +85,191 @@
 <script src="/scripts/evolution_data.js"></script>
 <script src="/scripts/evolution_db.js"></script>
 <script src="/scripts/evolution_widget.js"></script>
-<!-- V3.6: Mimo on evolution page -->
-<script src="/scripts/mimo.js"></script>
+<script src="/scripts/mimo-evolution.js"></script>
 
 <script>
-// ═══════════════════════════════════════════════════════════════
-// Evolution Page Controller — V3.6
-// ═══════════════════════════════════════════════════════════════
-
+// ── Evolution page controller V3.7 ────────────────────────────
 let currentEvo = null;
 let unlockedStages = [];
 let completedChapters = [];
 
 async function initEvoPage() {
-  const loggedIn = await Auth.tryAutoLogin();
-  if (!loggedIn) { window.location.href = '/'; return; }
+  const ok = await Auth.tryAutoLogin();
+  if (!ok) { window.location.href = '/'; return; }
 
   const student = Auth.student;
+  document.getElementById('app-header').style.display = 'flex';
+  document.getElementById('header-name').textContent  = student.name;
+  document.getElementById('header-xp').textContent    = student.total_xp || 0;
+  const r = Gamification.getGlobalRank(student.total_xp || 0);
+  document.getElementById('header-rank').textContent  = r.icon + ' ' + r.label;
 
-  // Header
-  const hdr = document.getElementById('app-header');
-  if (hdr) hdr.style.display = 'flex';
-  const nameEl = document.getElementById('header-name');
-  if (nameEl) nameEl.textContent = student.name;
-  const xpEl = document.getElementById('header-xp');
-  if (xpEl) xpEl.textContent = student.total_xp || 0;
-  const rankEl = document.getElementById('header-rank');
-  if (rankEl) {
-    const r = Gamification.getGlobalRank(student.total_xp || 0);
-    rankEl.textContent = r.icon + ' ' + r.label;
-  }
-
-  document.getElementById('btn-logout')?.addEventListener('click', () => {
+  document.getElementById('btn-logout').addEventListener('click', () => {
     if (confirm('Deseja sair?')) { Auth.logout(); window.location.href = '/'; }
   });
 
-  [currentEvo, completedChapters] = await Promise.all([
-    EvoDB.getOrCreate(student.id),
-    EvoDB.getCompletedChapters(student.id),
-  ]);
+  try {
+    [currentEvo, completedChapters] = await Promise.all([
+      EvoDB.getOrCreate(student.id),
+      EvoDB.getCompletedChapters(student.id),
+    ]);
+  } catch (e) {
+    console.warn('EvoDB:', e);
+    currentEvo = { stage:0, xp_total:0, class_path:null, lineage:null, alignment:null, element:null, armor:null, personality:null };
+    completedChapters = [];
+  }
 
   unlockedStages = STAGE_LABELS
-    .filter(s => {
-      const req = EVOLUTION_UNLOCKS[s.stage];
-      if (!req) return true;
-      return completedChapters.some(c => c >= req);
-    })
+    .filter(s => { const r = EVOLUTION_UNLOCKS[s.stage]; return !r || completedChapters.some(c => c >= r); })
     .map(s => s.stage);
 
   renderHeader();
   renderAllStages();
 
-  // ── V3.6: Mount Mimo on this page ────────────────────────────
-  Mimo.mount();
-  Mimo.updateMimoForm(currentEvo);
-  setTimeout(() => {
-    showMimoMessage(
-      'Esta é a minha <em>Árvore Evolutiva!</em> Faça suas escolhas e me ajude a me tornar mais poderosa! 💜',
+  // V3.7: Mount Mimo on this page
+  try {
+    MimoEvo.mount();
+    MimoEvo.applyEvo(currentEvo);
+    setTimeout(() => MimoEvo.showMsg(
+      'Esta é a minha <em>Árvore Evolutiva!</em> Faça suas escolhas e me deixe mais poderosa! 💜',
       '🌟', 'MIMO', 7000
-    );
-  }, 900);
+    ), 900);
+  } catch (e) { console.warn('Mimo on evo page:', e); }
 }
 
-// ── Render header ─────────────────────────────────────────────
 function renderHeader() {
-  const mimo = getMimoDescription(currentEvo);
-  document.getElementById('mimo-avatar-header').textContent = mimo.emoji;
-  document.getElementById('mimo-avatar-name').textContent   = mimo.name;
-  document.getElementById('mimo-avatar-stage').textContent  = `Estágio ${currentEvo.stage}`;
+  const xp     = currentEvo.xp_total || 0;
+  const lvInfo = getEvolutionLevel(xp);
+  const mimo   = getMimoDescription(currentEvo);
+
+  // Header avatar
+  const imgEl = document.getElementById('evo-header-img');
+  if (imgEl) {
+    const imgMap = { mamifero:'/assets/mascots/mimo-mammal.webp', reptil:'/assets/mascots/mimo-reptile.webp', ave:'/assets/mascots/mimo-bird.webp' };
+    imgEl.src = imgMap[currentEvo.class_path] || '/assets/mascots/mimo-base.webp';
+  }
+  document.getElementById('evo-header-name').textContent  = mimo.name;
+  document.getElementById('evo-header-stage').textContent = `Estágio ${currentEvo.stage}`;
 
   const pathMap = { mamifero:'Caminho Mamífero 🐾', reptil:'Caminho Réptil 🦎', ave:'Caminho Ave 🦅' };
   document.getElementById('evo-path-title').textContent =
-    currentEvo.class_path ? (pathMap[currentEvo.class_path] || 'do Mimo') : 'do Mimo';
+    currentEvo.class_path ? (pathMap[currentEvo.class_path]||'do Mimo') : 'do Mimo';
 
-  const lvInfo = getEvolutionLevel(currentEvo.xp_total || 0);
   document.getElementById('evo-xp-fill').style.width = lvInfo.percentage + '%';
   document.getElementById('evo-xp-pct').textContent  = lvInfo.percentage + '%';
   document.getElementById('evo-xp-hint').textContent =
     `Faltam ${lvInfo.neededXP - lvInfo.currentXP} XP para o nível ${lvInfo.level + 1}!`;
 
-  const dotsEl = document.getElementById('evo-progress-dots');
-  let html = '';
+  let dotsHtml = '';
   STAGE_LABELS.forEach((s, idx) => {
     const isDone   = currentEvo.stage > s.stage;
     const isActive = currentEvo.stage === s.stage;
     const cls = isDone ? 'done' : isActive ? 'active' : 'future';
-    html += `<div class="prog-dot ${cls}" title="Estágio ${s.stage}: ${s.name}">${isDone ? '✓' : s.stage}</div>`;
-    if (idx < STAGE_LABELS.length - 1)
-      html += `<div class="prog-dot-line ${isDone ? 'done' : ''}"></div>`;
+    dotsHtml += `<div class="prog-dot ${cls}" title="${s.name}">${isDone ? '✓' : s.stage}</div>`;
+    if (idx < STAGE_LABELS.length-1)
+      dotsHtml += `<div class="prog-dot-line ${isDone?'done':''}"></div>`;
   });
-  dotsEl.innerHTML = html;
+  document.getElementById('evo-progress-dots').innerHTML = dotsHtml;
 }
 
-// ── Render all stages ─────────────────────────────────────────
 function renderAllStages() {
-  const container = document.getElementById('stages-container');
-  let html = '';
+  const c = document.getElementById('stages-container');
+  let h   = '';
 
   // Stage 0
-  html += `
-  <div class="stage-section" id="stage-0">
-    <div class="stage-header">
-      <div class="stage-badge">
-        <span class="stage-icon">💎</span>
-        <div><div class="stage-num">ESTÁGIO 0</div><div class="stage-name">Origem</div></div>
-      </div>
-    </div>
+  h += `<div class="stage-section" id="stage-0">
+    <div class="stage-header"><div class="stage-badge"><span class="stage-icon">💎</span>
+      <div><div class="stage-num">ESTÁGIO 0</div><div class="stage-name">Origem</div></div></div></div>
     <div class="mimo-origin-card">
-      <div class="mimo-origin-emoji">🐱</div>
-      <div class="mimo-origin-text">
-        <h3>Mimo</h3>
-        <p>O pequeno gato branco cheio de curiosidade e pronto para aprender!
-        Todos começam aqui. Estude, complete atividades, ganhe XP e faça escolhas para evoluir o seu Mimo!</p>
-      </div>
-    </div>
-  </div>
-  <div class="section-divider">▼</div>`;
+      <img src="/assets/mascots/mimo-base.webp" style="width:80px;height:80px;object-fit:contain;filter:drop-shadow(0 4px 16px rgba(196,181,253,.6))" alt="Mimo">
+      <div class="mimo-origin-text"><h3>Mimo</h3>
+        <p>O pequeno gato branco cheio de curiosidade! Todos começam aqui. Estude, complete atividades, ganhe XP e faça escolhas para evoluir o seu Mimo!</p>
+      </div></div></div><div class="section-divider">▼</div>`;
 
-  // Stage 1 — Class
-  const s1u = unlockedStages.includes(1);
-  const s1c = currentEvo.class_path;
-  html += renderStageSection(1, 'Classe Evolutiva', '🐾', 'Capítulo 2', s1u, s1c,
-    'ESCOLHA SUA CLASSE',
-    CLASSES.map(c => ({
-      id: c.id, emoji: c.emoji, name: c.name, subname: null,
-      tagline: c.tagline, desc: c.description, color: c.color, bg: c.bg,
-      onclick: `selectChoice('class_path','${c.id}','${c.name}','${c.emoji}')`,
-      selected: s1c === c.id,
-    }))
-  );
-  html += '<div class="section-divider">▼</div>';
+  const s1u = unlockedStages.includes(1), s1c = currentEvo.class_path;
+  h += stageSection(1,'Classe Evolutiva','🐾','Cap. 2',s1u,s1c,'ESCOLHA SUA CLASSE',
+    CLASSES.map(c => ({ id:c.id,emoji:c.emoji,name:c.name,subname:null,tagline:c.tagline,desc:c.description,color:c.color,bg:c.bg,
+      onclick:`selectChoice('class_path','${c.id}','${c.name}','${c.emoji}')`, selected:s1c===c.id })));
+  h += '<div class="section-divider">▼</div>';
 
-  // Stage 2 — Lineage
-  const s2u = unlockedStages.includes(2) && !!s1c;
-  const s2c = currentEvo.lineage;
+  const s2u = unlockedStages.includes(2) && !!s1c, s2c = currentEvo.lineage;
   const lineageOpts = s1c ? LINEAGES[s1c] : LINEAGES.mamifero;
-  html += renderStageSection(2, 'Linhagem', '🧬', 'Capítulo 4', s2u, s2c,
-    `ESCOLHA SUA LINHAGEM${s1c ? ' (' + CLASSES.find(c=>c.id===s1c)?.name.toUpperCase() + ')' : ''}`,
-    lineageOpts.map(l => ({
-      id: l.id, emoji: l.emoji, name: l.name, subname: l.subname,
-      tagline: null, desc: l.description, color: l.color, bg: 'rgba(107,33,168,0.12)',
-      onclick: `selectChoice('lineage','${l.id}','${l.subname}','${l.emoji}')`,
-      selected: s2c === l.id,
-    }))
-  );
-  html += '<div class="section-divider">▼</div>';
+  h += stageSection(2,'Linhagem','🧬','Cap. 4',s2u,s2c,
+    `ESCOLHA SUA LINHAGEM${s1c?' ('+CLASSES.find(x=>x.id===s1c)?.name.toUpperCase()+')':''}`,
+    lineageOpts.map(l => ({ id:l.id,emoji:l.emoji,name:l.name,subname:l.subname,tagline:null,desc:l.description,color:l.color,bg:'rgba(107,33,168,.12)',
+      onclick:`selectChoice('lineage','${l.id}','${l.subname}','${l.emoji}')`, selected:s2c===l.id })));
+  h += '<div class="section-divider">▼</div>';
 
-  // Stage 3 — Alignment
-  const s3u = unlockedStages.includes(3) && !!s2c;
-  const s3c = currentEvo.alignment;
-  html += renderStageSection(3, 'Alinhamento', '🌙', 'Capítulo 6', s3u, s3c,
-    'ESCOLHA SEU ALINHAMENTO',
-    ALIGNMENTS.map(a => ({
-      id: a.id, emoji: a.emoji, name: a.name, subname: null,
-      tagline: null, desc: a.description, color: a.color, bg: a.bg,
-      onclick: `selectChoice('alignment','${a.id}','${a.name}','${a.emoji}')`,
-      selected: s3c === a.id,
-    })), 'two-col'
-  );
-  html += '<div class="section-divider">▼</div>';
+  const s3u = unlockedStages.includes(3) && !!s2c, s3c = currentEvo.alignment;
+  h += stageSection(3,'Alinhamento','🌙','Cap. 6',s3u,s3c,'ESCOLHA SEU ALINHAMENTO',
+    ALIGNMENTS.map(a => ({ id:a.id,emoji:a.emoji,name:a.name,subname:null,tagline:null,desc:a.description,color:a.color,bg:a.bg,
+      onclick:`selectChoice('alignment','${a.id}','${a.name}','${a.emoji}')`, selected:s3c===a.id })),'two-col');
+  h += '<div class="section-divider">▼</div>';
 
-  // Stage 4 — Element
-  const s4u = unlockedStages.includes(4) && !!s3c;
-  const s4c = currentEvo.element;
-  html += renderStageSection(4, 'Elemento', '⚡', 'Capítulo 8', s4u, s4c,
-    'ESCOLHA SEU ELEMENTO',
-    ELEMENTS.map(e => ({
-      id: e.id, emoji: e.emoji, name: e.name, subname: null,
-      tagline: null, desc: e.description, color: e.color, bg: e.bg,
-      onclick: `selectChoice('element','${e.id}','${e.name}','${e.emoji}')`,
-      selected: s4c === e.id,
-    }))
-  );
-  html += '<div class="section-divider">▼</div>';
+  const s4u = unlockedStages.includes(4) && !!s3c, s4c = currentEvo.element;
+  h += stageSection(4,'Elemento','⚡','Cap. 8',s4u,s4c,'ESCOLHA SEU ELEMENTO',
+    ELEMENTS.map(e => ({ id:e.id,emoji:e.emoji,name:e.name,subname:null,tagline:null,desc:e.description,color:e.color,bg:e.bg,
+      onclick:`selectChoice('element','${e.id}','${e.name}','${e.emoji}')`, selected:s4c===e.id })));
+  h += '<div class="section-divider">▼</div>';
 
-  // Stage 5 — Armor
-  const s5u = unlockedStages.includes(5) && !!s4c;
-  const s5c = currentEvo.armor;
-  html += renderStageSection(5, 'Armadura', '🛡️', 'Capítulo 11', s5u, s5c,
-    'ESCOLHA SUA ARMADURA',
-    ARMORS.map(a => ({
-      id: a.id, emoji: a.emoji, name: a.name, subname: null,
-      tagline: null, desc: a.description, color: a.color, bg: a.bg,
-      onclick: `selectChoice('armor','${a.id}','${a.name}','${a.emoji}')`,
-      selected: s5c === a.id,
-    }))
-  );
-  html += '<div class="section-divider">▼</div>';
+  const s5u = unlockedStages.includes(5) && !!s4c, s5c = currentEvo.armor;
+  h += stageSection(5,'Armadura','🛡️','Cap. 11',s5u,s5c,'ESCOLHA SUA ARMADURA',
+    ARMORS.map(a => ({ id:a.id,emoji:a.emoji,name:a.name,subname:null,tagline:null,desc:a.description,color:a.color,bg:a.bg,
+      onclick:`selectChoice('armor','${a.id}','${a.name}','${a.emoji}')`, selected:s5c===a.id })));
+  h += '<div class="section-divider">▼</div>';
 
-  // Stage 6 — Personality
-  const s6u = unlockedStages.includes(6) && !!s5c;
-  const s6c = currentEvo.personality;
-  html += renderStageSection(6, 'Personalidade e Objeto', '❤️', 'Capítulo 15', s6u, s6c,
-    'ESCOLHA SUA PERSONALIDADE E RECEBA SEU OBJETO!',
-    PERSONALITIES.map(p => ({
-      id: p.id, emoji: p.emoji, name: p.name, subname: null,
-      tagline: null, desc: p.description, color: p.color, bg: p.bg,
-      objects: p.objects, objectEmojis: p.objectEmojis,
-      onclick: `selectChoice('personality','${p.id}','${p.name}','${p.emoji}')`,
-      selected: s6c === p.id,
-    }))
-  );
-  html += '<div class="section-divider">▼</div>';
+  const s6u = unlockedStages.includes(6) && !!s5c, s6c = currentEvo.personality;
+  h += stageSection(6,'Personalidade e Objeto','❤️','Cap. 15',s6u,s6c,'ESCOLHA SUA PERSONALIDADE!',
+    PERSONALITIES.map(p => ({ id:p.id,emoji:p.emoji,name:p.name,subname:null,tagline:null,desc:p.description,color:p.color,bg:p.bg,
+      objects:p.objects,objectEmojis:p.objectEmojis,
+      onclick:`selectChoice('personality','${p.id}','${p.name}','${p.emoji}')`, selected:s6c===p.id })));
+  h += '<div class="section-divider">▼</div>';
 
-  // Stage 7 — Final
   const s7u = unlockedStages.includes(7) && !!s6c;
-  html += `
-  <div class="stage-section ${s7u ? '' : 'locked-section'}" id="stage-7">
-    <div class="stage-header">
-      <div class="stage-badge">
-        <span class="stage-icon">👑</span>
-        <div><div class="stage-num">ESTÁGIO 7</div><div class="stage-name">Evolução Final</div></div>
-      </div>
-      ${s7u
-        ? '<span class="stage-chosen-pill">✓ Forma Final!</span>'
-        : '<span class="stage-locked-pill">🔒 Capítulo 20</span>'}
+  h += `<div class="stage-section ${s7u?'':'locked-section'}" id="stage-7">
+    <div class="stage-header"><div class="stage-badge"><span class="stage-icon">👑</span>
+      <div><div class="stage-num">ESTÁGIO 7</div><div class="stage-name">Evolução Final</div></div></div>
+      ${s7u?'<span class="stage-chosen-pill">✓ Forma Final!</span>':'<span class="stage-locked-pill">🔒 Capítulo 20</span>'}
     </div>
     <div class="stage-title-line">EVOLUÇÃO FINAL — SEU MIMO ATINGE SUA FORMA ADULTA!</div>
     <div class="mimo-summary">
-      ${s7u
-        ? `<div class="big-mimo">${getMimoDescription(currentEvo).emoji}✨</div>
-           <h3>${getMimoDescription(currentEvo).name} — Forma Final</h3>
-           <p class="mimo-stage-label">LV${currentEvo.evolution_level} — ${currentEvo.xp_total} XP</p>
-           <div class="mimo-traits">${buildTraitChips(currentEvo)}</div>`
-        : `<div class="big-mimo" style="opacity:.28;filter:grayscale(1)">❓</div>
-           <h3 style="color:rgba(243,232,255,.35)">Forma Final Bloqueada</h3>
-           <p style="font-size:12px;color:rgba(243,232,255,.35)">Complete até o Capítulo 20 para desbloquear!</p>`}
-    </div>
-    <p style="text-align:center;font-size:13px;color:var(--text-light);line-height:1.7;max-width:520px;margin:0 auto;">
-      ${s7u ? 'Seu Mimo alcança sua forma adulta, com todo o poder das suas escolhas!' : 'Estude, evolua e escreva sua própria história na Academia das Questões!'}
-    </p>
+      ${s7u ? `<img src="${{mamifero:'/assets/mascots/mimo-mammal.webp',reptil:'/assets/mascots/mimo-reptile.webp',ave:'/assets/mascots/mimo-bird.webp'}[currentEvo.class_path]||'/assets/mascots/mimo-base.webp'}"
+        class="big-mimo" style="width:80px;height:80px;object-fit:contain;display:inline-block;" alt="Mimo">
+        <h3>${getMimoDescription(currentEvo).name} — Forma Final</h3>
+        <p class="mimo-stage-label">LV${currentEvo.evolution_level||0} — ${currentEvo.xp_total||0} XP</p>`
+      : `<div class="big-mimo" style="opacity:.28;filter:grayscale(1)">❓</div>
+         <h3 style="color:rgba(243,232,255,.35)">Forma Final Bloqueada</h3>
+         <p style="font-size:12px;color:rgba(243,232,255,.35)">Complete até o Capítulo 20 para desbloquear!</p>`}
+    </div></div>
+
+  <div style="text-align:center;margin-top:28px;padding:18px;
+    background:linear-gradient(135deg,rgba(45,16,96,.7),rgba(13,4,28,.9));
+    border:1px solid rgba(245,158,11,.22);border-radius:14px;">
+    <div style="font-family:'Cinzel',serif;font-size:13px;color:#f59e0b;margin-bottom:7px">✦ TODAS AS ESCOLHAS SÃO ÚNICAS! ✦</div>
+    <p style="font-size:12px;color:#f3e8ff;line-height:1.7">Não existe caminho certo ou errado. Escolha o que mais combina com você!</p>
   </div>`;
 
-  html += `
-  <div style="text-align:center;margin-top:32px;padding:20px;
-    background:linear-gradient(135deg,rgba(45,16,96,.7),rgba(15,5,32,.9));
-    border:1px solid rgba(245,158,11,.25);border-radius:14px;">
-    <div style="font-family:'Cinzel',serif;font-size:13px;color:var(--gold);margin-bottom:8px;">✦ TODAS AS ESCOLHAS SÃO ÚNICAS E ESPECIAIS! ✦</div>
-    <p style="font-size:12px;color:var(--text-light);line-height:1.7;">
-      Não existe caminho certo ou errado. Escolha o que mais combina com você!<br>
-      <strong style="color:var(--text-gold)">Progresso é tudo!</strong> Complete capítulos, ganhe XP e veja seu Mimo evoluir!
-    </p>
-  </div>`;
-
-  container.innerHTML = html;
+  c.innerHTML = h;
 }
 
-// ── Stage section builder ─────────────────────────────────────
-function renderStageSection(n, name, icon, lockCap, unlocked, chosenId, title, cards, gridClass='') {
+function stageSection(n, name, icon, lockCap, unlocked, chosenId, title, cards, gridClass='') {
   const locked = !unlocked;
   const hasChoice = !!chosenId;
-  let html = `
-  <div class="stage-section ${locked?'locked-section':''}" id="stage-${n}">
+  let h = `<div class="stage-section ${locked?'locked-section':''}" id="stage-${n}">
     <div class="stage-header">
-      <div class="stage-badge">
-        <span class="stage-icon">${icon}</span>
-        <div><div class="stage-num">ESTÁGIO ${n}</div><div class="stage-name">${name}</div></div>
-      </div>
-      ${locked
-        ? `<span class="stage-locked-pill">🔒 ${lockCap}</span>`
-        : hasChoice
-          ? `<span class="stage-chosen-pill">✓ ${cards.find(c=>c.id===chosenId)?.name||'Escolhido'}</span>`
-          : ''}
+      <div class="stage-badge"><span class="stage-icon">${icon}</span>
+        <div><div class="stage-num">ESTÁGIO ${n}</div><div class="stage-name">${name}</div></div></div>
+      ${locked?`<span class="stage-locked-pill">🔒 ${lockCap}</span>`:
+        hasChoice?`<span class="stage-chosen-pill">✓ ${cards.find(c=>c.id===chosenId)?.name||'Escolhido'}</span>`:''}
     </div>
     <div class="stage-title-line">${title}</div>
     <div class="choice-grid ${gridClass}">`;
-
   cards.forEach(card => {
     const sel = card.selected;
-    const bc  = card.color || '#9333ea';
-    html += `
-    <div class="choice-card ${sel?'selected':''}"
-      style="border-color:${sel?bc:'rgba(107,33,168,0.35)'};${sel?`background:${card.bg}`:''};"
+    h += `<div class="choice-card ${sel?'selected':''}"
+      style="border-color:${sel?card.color:'rgba(107,33,168,.35)'};${sel?`background:${card.bg}`:''}"
       onclick="${locked?'':card.onclick}">
-      <div class="card-emoji-wrap" style="color:${card.color};border-color:${sel?card.color:'rgba(245,158,11,0.3)'};">${card.emoji}</div>
+      <div class="card-emoji-wrap" style="color:${card.color};border-color:${sel?card.color:'rgba(245,158,11,.28)'};">${card.emoji}</div>
       <div class="card-choice-name" style="color:${card.color}">${card.name}</div>
       ${card.subname?`<div class="card-choice-subname">${card.subname}</div>`:''}
       ${card.tagline?`<div class="card-choice-tagline" style="color:${card.color}">${card.tagline}</div>`:''}
@@ -375,61 +277,31 @@ function renderStageSection(n, name, icon, lockCap, unlocked, chosenId, title, c
       ${card.objects?`<div class="card-objects">${card.objects.map((o,i)=>`<span class="obj-chip">${card.objectEmojis[i]} ${o}</span>`).join('')}</div>`:''}
     </div>`;
   });
-
-  html += `</div></div>`;
-  return html;
+  return h + `</div></div>`;
 }
 
-function buildTraitChips(evo) {
-  const chips = [];
-  if (evo.class_path) { const c=CLASSES.find(x=>x.id===evo.class_path); if(c) chips.push(`<div class="mimo-trait-chip">${c.emoji} ${c.name}</div>`); }
-  if (evo.lineage&&evo.class_path) { const l=(LINEAGES[evo.class_path]||[]).find(x=>x.id===evo.lineage); if(l) chips.push(`<div class="mimo-trait-chip">${l.emoji} ${l.subname}</div>`); }
-  if (evo.alignment) { const a=ALIGNMENTS.find(x=>x.id===evo.alignment); if(a) chips.push(`<div class="mimo-trait-chip">${a.emoji} ${a.name}</div>`); }
-  if (evo.element)   { const e=ELEMENTS.find(x=>x.id===evo.element);     if(e) chips.push(`<div class="mimo-trait-chip">${e.emoji} ${e.name}</div>`); }
-  if (evo.armor)     { const r=ARMORS.find(x=>x.id===evo.armor);         if(r) chips.push(`<div class="mimo-trait-chip">${r.emoji} ${r.name}</div>`); }
-  if (evo.personality){ const p=PERSONALITIES.find(x=>x.id===evo.personality); if(p) chips.push(`<div class="mimo-trait-chip">${p.emoji} ${p.name}</div>`); }
-  return chips.join('') || '<div class="mimo-trait-chip">🐱 Origem</div>';
-}
-
-// ── Select a choice ───────────────────────────────────────────
 async function selectChoice(field, value, name, emoji) {
   const student = Auth.student;
   if (!student) return;
-  const prev = currentEvo[field];
-  const result = await EvoDB.saveChoice(student.id, field, value);
-  currentEvo = result.evo;
-
-  // ── V3.6: update Mimo image when class changes ────────────────
-  if (field === 'class_path') {
-    Mimo.updateMimoForm(currentEvo);
-    setTimeout(() => {
-      const classNames = { mamifero: 'Mamífero', reptil: 'Réptil', ave: 'Ave' };
-      showMimoMessage(
-        `Eu me tornei um <em>${classNames[value] || value}</em>! Muito obrigada pela escolha! 💜`,
-        emoji, 'EVOLUINDO!', 6000
-      );
-      Mimo.celebrate();
-    }, 400);
-  } else {
-    setTimeout(() => {
-      showMimoMessage(`${name} escolhido${prev ? ' (alterado)' : ''}! <em>Boa escolha!</em> ✨`, emoji, 'ESCOLHA!', 4000);
-    }, 200);
-  }
-
-  renderHeader();
-  renderAllStages();
-
-  // Scroll to next stage
-  const fieldToStage = { class_path:2, lineage:3, alignment:4, element:5, armor:6, personality:7 };
-  const nextStage = fieldToStage[field];
-  if (nextStage) {
-    setTimeout(() => {
-      document.getElementById('stage-' + nextStage)
-        ?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }, 350);
-  }
-
-  showToast(emoji, `${name} escolhido${prev ? ' (alterado)' : ''}! ✨`);
+  try {
+    const result = await EvoDB.saveChoice(student.id, field, value);
+    currentEvo = result.evo;
+    if (field === 'class_path') {
+      MimoEvo.applyEvo(currentEvo);
+      setTimeout(() => {
+        MimoEvo.celebrate();
+        MimoEvo.showMsg(`Virei um <em>${name}</em>! Obrigada pela escolha! 💜`, emoji, 'EVOLUINDO!', 6000);
+      }, 300);
+    } else {
+      setTimeout(() => MimoEvo.showMsg(`${name} escolhido! <em>Boa escolha!</em> ✨`, emoji, 'ESCOLHA!', 4000), 200);
+    }
+    renderHeader();
+    renderAllStages();
+    const fieldToStage = { class_path:2, lineage:3, alignment:4, element:5, armor:6, personality:7 };
+    const next = fieldToStage[field];
+    if (next) setTimeout(() => document.getElementById('stage-'+next)?.scrollIntoView({behavior:'smooth',block:'start'}), 350);
+    showToast(emoji, `${name} escolhido! ✨`);
+  } catch (e) { console.warn('selectChoice:', e); }
 }
 
 function showToast(icon, msg) {
@@ -439,8 +311,6 @@ function showToast(icon, msg) {
   t.classList.add('show');
   setTimeout(() => t.classList.remove('show'), 2800);
 }
-
-function goBack() { window.location.href = '/'; }
 
 document.addEventListener('DOMContentLoaded', initEvoPage);
 </script>

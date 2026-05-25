@@ -1,61 +1,74 @@
-# 🐱 Academia das Questões — V3.6 (Mimo Flutuante)
+# 🐱 Academia das Questões — V3.7 (Hotfix + Mimo Evolutivo Completo)
 
-Mascote MIMO com imagens reais WebP, camada flutuante, balões de fala contextuais e integração total com o sistema V3.5.
+Corrige todos os bugs críticos da V3.6 e entrega o sistema evolutivo do Mimo funcionando de ponta a ponta.
+
+---
+
+## 🐛 Bugs corrigidos nesta versão
+
+| # | Bug | Correção |
+|---|-----|----------|
+| 1 | `"12 de 20 questões"` quando a atividade tem só 12 | `app.js` agora usa `questions.length` — nunca valor fixo |
+| 2 | `"EvoWidget is not defined"` persistente | Todos os calls ao EvoWidget envolvidos em `try/catch` + `if (window.EvoWidget)` |
+| 3 | Transparência quebrada na cabeça do Mimo | Novo algoritmo de remoção de fundo (saturação + brilho + suavização de borda) |
+| 4 | Evolução não dispara ao atingir XP | `MimoEvo.onXPGained(prevXP, newXP)` chamado em `finishActivity()` com detecção de threshold |
 
 ---
 
 ## 📁 Arquivos desta versão
 
-Copie **somente estes arquivos** sobre o seu repositório existente:
+Copie **somente estes arquivos** sobre o repositório existente:
 
 ```
-/index.html                          ← atualizado (link mimo.css + mimo.js)
-/sw.js                               ← atualizado (cache mime assets)
-/evolution/index.html                ← atualizado (Mimo na árvore evolutiva)
+/index.html                           ← atualizado
+/sw.js                                ← atualizado (V3.7 cache name)
+/evolution/index.html                 ← atualizado (usa MimoEvo)
 
-/styles/mimo.css                     ← NOVO
+/styles/mimo-evolution.css            ← NOVO (substitui mimo.css)
 
-/scripts/mimo.js                     ← NOVO
-/scripts/app.js                      ← atualizado (integração Mimo)
+/scripts/mimo-evolution.js            ← NOVO (substitui mimo.js)
+/scripts/app.js                       ← atualizado (todos os bugs corrigidos)
 
-/assets/mascots/mimo-base.webp       ← NOVO (gato branco)
-/assets/mascots/mimo-mammal.webp     ← NOVO (leãozinho dourado)
-/assets/mascots/mimo-reptile.webp    ← NOVO (dragãozinho verde)
-/assets/mascots/mimo-bird.webp       ← NOVO (passarinho azul)
+/assets/mascots/mimo-base.webp        ← NOVO (alpha corrigido)
+/assets/mascots/mimo-mammal.webp      ← NOVO (alpha corrigido)
+/assets/mascots/mimo-reptile.webp     ← NOVO (alpha corrigido)
+/assets/mascots/mimo-bird.webp        ← NOVO (alpha corrigido)
+/assets/mascots/mimo-base.png         ← PNG fallback
+/assets/mascots/mimo-mammal.png       ← PNG fallback
+/assets/mascots/mimo-reptile.png      ← PNG fallback
+/assets/mascots/mimo-bird.png         ← PNG fallback
 ```
 
-> Todos os outros arquivos (main.css, animations.css, evolution.css,
-> data.js, db.js, auth.js, gamification.js, ui.js, evolution_data.js,
-> evolution_db.js, evolution_widget.js) **permanecem inalterados**.
+### Arquivos que NÃO mudam (manter como estão)
+```
+main.css · animations.css · evolution.css
+data.js · db.js · auth.js · gamification.js · ui.js
+evolution_data.js · evolution_db.js · evolution_widget.js
+manifest.json · vercel.json
+```
+
+### Arquivos para REMOVER do repositório (substituídos)
+```
+/styles/mimo.css      → deletar, substituído por mimo-evolution.css
+/scripts/mimo.js      → deletar, substituído por mimo-evolution.js
+```
 
 ---
 
-## 🖼️ Sobre as imagens do Mimo
-
-Os 4 WebPs foram gerados a partir da imagem de referência enviada,
-com fundo transparente e crop automático.
-
-| Arquivo | Usado quando |
-|---------|-------------|
-| `mimo-base.webp` | Antes de escolher classe (estágio 0) |
-| `mimo-mammal.webp` | Classe Mamífero escolhida |
-| `mimo-reptile.webp` | Classe Réptil escolhida |
-| `mimo-bird.webp` | Classe Ave escolhida |
-
-**Para substituir por imagens melhores no futuro:**
-Basta trocar os arquivos `.webp` mantendo os mesmos nomes.
-O sistema escolhe automaticamente pelo campo `class_path` da evolução.
-
----
-
-## 🐙 Deploy no GitHub + Vercel
+## 🚀 Deploy
 
 ```bash
 cd Academia-das_questoes
 
-# Copie os arquivos listados acima
+# 1. Remover arquivos obsoletos
+git rm styles/mimo.css scripts/mimo.js 2>/dev/null || true
+
+# 2. Copiar os novos arquivos desta versão
+# (copie sobre o repositório o conteúdo do ZIP)
+
+# 3. Commit e push
 git add .
-git commit -m "feat: V3.6 — Mimo flutuante com WebP, balões de fala e integração total"
+git commit -m "fix: V3.7 — Hotfix questões, EvoWidget guard, alpha Mimo, trigger evolução"
 git push origin main
 ```
 
@@ -63,100 +76,90 @@ O Vercel detecta o push e faz deploy automático. ✓
 
 ---
 
-## 🎭 Comportamento do Mimo
+## 🌟 Sistema evolutivo do Mimo — como funciona agora
 
-### Posicionamento
-- **Desktop**: canto inferior direito, 18px das bordas
-- **Mobile**: compacto, 10px das bordas
-- **Durante atividades**: sobe 90px para não cobrir o botão "Concluir"
+### Thresholds de XP (baseados em XP total do aluno)
 
-### Interações automáticas
+| XP total | Estágio desbloqueado |
+|----------|---------------------|
+| 100 XP  | 🐾 Classe Evolutiva |
+| 300 XP  | 🧬 Linhagem |
+| 600 XP  | 🌙 Alinhamento |
+| 900 XP  | ⚡ Elemento |
+| 1300 XP | 🛡️ Armadura |
+| 1800 XP | ❤️ Personalidade |
+| 2500 XP | 👑 Evolução Final |
 
-| Momento | Reação do Mimo |
-|---------|---------------|
-| Login screen | Mensagem de boas-vindas |
-| Erro de login | Shake + mensagem de erro |
-| Entrar no dashboard | Tip de boas-vindas |
-| Abrir atividade | Dica de início |
-| Clicar no Mimo | Tip aleatório |
-| Atividade incompleta | Shake + aviso |
-| Antes de concluir | Tip de revisão |
-| Concluir atividade | Celebração + bounce |
-| 100% de acertos | Mensagem especial |
-| Evolução de nível | Celebração |
-| Estágio desbloqueado | Mensagem especial |
-| Ficar online → offline | Mensagem de offline |
-| Logout | Mensagem de despedida |
-| A cada ~35-55s | Tip de idle aleatório |
-| Na árvore evolutiva | Explica a evolução |
-| Escolher classe | Mimo mostra nova forma + celebra |
+### Fluxo ao ganhar XP
 
-### Minimizar / restaurar
-- Botão **−** no topo esquerdo do mascote minimiza
-- Pequena **pílula** aparece no canto inferior direito para restaurar
-- Clique na pílula restaura o Mimo com mensagem de boas-vindas
-
----
-
-## 🛠️ API pública do Mimo
-
-Disponível globalmente em qualquer arquivo JS do projeto:
-
-```js
-// Mostrar uma mensagem no balão
-showMimoMessage('Texto aqui! <em>Destaque em amarelo</em>', '💡', 'RÓTULO', 5000);
-
-// Atualizar a imagem conforme a evolução
-updateMimoForm(evolutionData); // evolutionData.class_path = 'mamifero' | 'reptil' | 'ave'
-
-// Mostrar tip por contexto
-getMimoTip('activity_start');    // dica de início de atividade
-getMimoTip('hint_math');         // dica de matemática/frações
-getMimoTip('hint_interpret');    // dica de interpretação
-getMimoTip('before_finish');     // dica antes de concluir
-getMimoTip('incomplete_warning');// aviso de questões em branco
-getMimoTip('correct');           // comemoração de acerto
-getMimoTip('activity_complete'); // comemoração de conclusão
-getMimoTip('story_reading');     // dica durante história
-getMimoTip('evolution_unlock');  // novo estágio desbloqueado
-getMimoTip('idle');              // tip aleatório (sem contexto)
-getMimoTip('welcome');           // boas-vindas
-
-// Minimizar / restaurar
-minimizeMimo();
-restoreMimo();
+```
+Aluna completa atividade
+    → finishActivity() calcula XP real
+    → MimoEvo.onXPGained(prevXP, newXP) é chamado
+    → checkUnlocks() detecta se threshold foi cruzado
+    → celebrate() + tip('evolution_ready') dispara
+    → Mimo bounce + balão "Posso evoluir! Vai na Árvore!"
+    → Aluna clica no Mimo → openPanel('evolucoes')
+    → Painel mostra o estágio desbloqueado com botão "Ir para Árvore"
 ```
 
----
+### Painel do Mimo (clique no mascote)
 
-## 🎨 Personalizar mensagens
+Três abas:
 
-Edite o objeto `MIMO_MESSAGES` em `/scripts/mimo.js`.
-Cada contexto é um array — o sistema escolhe aleatoriamente.
+**📊 Status** — XP, Rank, Estágio, Classe, todos os atributos escolhidos
 
-```js
-MIMO_MESSAGES.activity_start = [
-  { icon: '📖', label: 'DICA', text: 'Sua mensagem aqui! <em>Destaque em amarelo</em>' },
-  // ...
-];
-```
+**🌟 Evoluções** — Árvore com todos os 6 campos, mostrando: ✓ Feito / 🔓 Disponível / 🔒 Bloqueado
+
+**🔓 Próximo** — Barra de progresso até o próximo estágio, com botão "Ir para Árvore Evolutiva" quando disponível
 
 ---
 
-## ✅ Checklist de Deploy
+## 🎭 Dicas contextuais do Mimo
 
-- [ ] Arquivos copiados para o repositório
-- [ ] `git push origin main`
-- [ ] Vercel fez deploy
-- [ ] Abrir o site → Mimo aparece no canto inferior direito
-- [ ] Clicar no Mimo → balão de fala aparece
-- [ ] Botão **−** minimiza, pílula restaura
-- [ ] Completar atividade → Mimo bounce + balão de celebração
-- [ ] Entrar na árvore evolutiva → Mimo fala sobre a árvore
-- [ ] Escolher classe → Mimo muda de imagem + celebra
+| Atividade | Tipo de dica |
+|-----------|-------------|
+| IDs 5-10 (Frações/Sequências) | `math` — dicas de cálculo |
+| IDs 1-4 (Interpretação) | `start` / `reading` |
+| Questões em branco | `incomplete` — Mimo balança + avisa |
+| Antes de concluir | `finish` — Mimo pede revisão |
+| Acerto / conclusão | `correct` / `activity_complete` + bounce |
+| 100% de acertos | Mensagem especial de celebração |
+| Evolução disponível | `evolution_ready` + bounce |
+| Idle (~38–58s) | Verifica evolução disponível, senão `idle` |
 
 ---
 
-**Academia das Questões V3.6**  
-Repositório: https://github.com/wwmotrix-collab/Academia-das_questoes  
+## 🖼️ Sobre os assets
+
+Os 4 WebPs foram recortados com algoritmo melhorado:
+
+- Remove apenas branco **puro sem saturação** (brightness > 248 + saturation < 10)
+- Transição suave nas bordas (sem corte abrupto)
+- Preserva pelos brancos, penas e detalhes claros do personagem
+- Fundo 100% transparente
+
+Para substituir por versões melhores: basta trocar os `.webp` mantendo os mesmos nomes. O sistema detecta automaticamente pelo `class_path` da evolução.
+
+---
+
+## ✅ Checklist de verificação pós-deploy
+
+- [ ] Login funciona sem erros no console
+- [ ] Dashboard carrega sem `"EvoWidget is not defined"`
+- [ ] Mimo aparece no canto inferior direito
+- [ ] Mimo sem transparência quebrada na cabeça
+- [ ] Clicar no Mimo abre o painel
+- [ ] Painel tem 3 abas funcionando
+- [ ] Completar atividade: pontuação `X de Y` correta (Y = total real da atividade)
+- [ ] XP ganho aparece corretamente
+- [ ] Ao atingir threshold: Mimo bounce + balão de evolução
+- [ ] Árvore evolutiva: ao escolher classe, Mimo muda de imagem
+- [ ] Minimizar / restaurar Mimo funciona
+- [ ] Mobile: Mimo não cobre o botão "Concluir"
+
+---
+
+**Academia das Questões V3.7**
+Repositório: https://github.com/wwmotrix-collab/Academia-das_questoes
 Supabase: https://nqifdhsskestqytooeap.supabase.co
