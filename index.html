@@ -12,14 +12,13 @@
   <link rel="manifest" href="/manifest.json">
   <link rel="apple-touch-icon" href="/assets/icons/icon-192.png">
   <link rel="icon" type="image/png" href="/assets/icons/icon-192.png">
-
-  <!-- V2 styles -->
-  <link rel="stylesheet" href="./styles/main.css">
-  <link rel="stylesheet" href="./styles/animations.css">
-  <!-- V3 evolution styles -->
-  <link rel="stylesheet" href="./styles/evolution.css">
-  <!-- V3.7 Mimo (replaces mimo.css) -->
-  <link rel="stylesheet" href="./styles/mimo-evolution.css">
+  <!-- V2 styles (unchanged) -->
+  <link rel="stylesheet" href="/styles/main.css">
+  <link rel="stylesheet" href="/styles/animations.css">
+  <!-- V3 evolution styles (unchanged) -->
+  <link rel="stylesheet" href="/styles/evolution.css">
+  <!-- V3.7.1 Mimo (replaces mimo.css and mimo-evolution.css from V3.7) -->
+  <link rel="stylesheet" href="/styles/mimo-evolution.css">
 </head>
 <body>
 
@@ -105,11 +104,12 @@
     <div class="badges-row" id="badges-row"></div>
   </div>
 
-  <!-- Mimo evolution widget slot -->
+  <!-- Mimo widget slot -->
   <div style="padding:0 16px;">
     <div id="mimo-widget-slot"></div>
   </div>
 
+  <!-- Activities -->
   <div style="padding:0 16px;">
     <div class="index-section-title">SUAS MISSÕES</div>
     <div class="activities-grid" id="activities-grid"></div>
@@ -137,13 +137,13 @@
   </div>
 </div>
 
-<!-- ══════ SYNC INDICATOR ══════ -->
+<!-- ══════ SYNC ══════ -->
 <div class="sync-indicator" id="sync-indicator">
   <div class="sync-dot"></div>
   <span class="sync-text">Salvando...</span>
 </div>
 
-<!-- ══════ INSTALL PROMPT ══════ -->
+<!-- ══════ INSTALL ══════ -->
 <div class="install-prompt" id="install-prompt">
   <p>📲 Instale a <strong>Academia das Questões</strong> no celular!</p>
   <button class="btn-install" id="btn-install">Instalar</button>
@@ -151,23 +151,20 @@
 </div>
 
 <!-- ══════════════ SCRIPTS ══════════════ -->
-<!-- V2 core — UNCHANGED, load first -->
-<script src="./scripts/data.js"></script>
-<script src="./scripts/db.js"></script>
-<script src="./scripts/auth.js"></script>
-<script src="./scripts/gamification.js"></script>
-<script src="./scripts/ui.js"></script>
-
-<!-- V3 evolution — load before app, guarded inside app.js -->
-<script src="./scripts/evolution_data.js"></script>
-<script src="./scripts/evolution_db.js"></script>
-<script src="./scripts/evolution_widget.js"></script>
-
-<!-- V3.7 Mimo (single file, replaces mimo.js + evolution trigger) -->
-<script src="./scripts/mimo-evolution.js"></script>
-
-<!-- App controller — must be LAST -->
-<script src="./scripts/app.js"></script>
+<!-- V2 core — load first, unchanged -->
+<script src="/scripts/data.js"></script>
+<script src="/scripts/db.js"></script>
+<script src="/scripts/auth.js"></script>
+<script src="/scripts/gamification.js"></script>
+<script src="/scripts/ui.js"></script>
+<!-- V3 evolution — guarded inside app.js -->
+<script src="/scripts/evolution_data.js"></script>
+<script src="/scripts/evolution_db.js"></script>
+<script src="/scripts/evolution_widget.js"></script>
+<!-- V3.7.1 Mimo (single file, all-in-one) -->
+<script src="/scripts/mimo-evolution.js"></script>
+<!-- App — LAST -->
+<script src="/scripts/app.js"></script>
 
 </body>
 </html>

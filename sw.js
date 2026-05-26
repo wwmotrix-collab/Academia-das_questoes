@@ -1,8 +1,8 @@
 // ═══════════════════════════════════════════════════════
-// Academia das Questões V3.7 — Service Worker
+// Academia das Questões V3.7.1 — Service Worker
 // ═══════════════════════════════════════════════════════
 
-const CACHE_NAME = 'academia-v37-cache-v1';
+const CACHE_NAME = 'academia-v371-cache-v1';
 
 const STATIC_ASSETS = [
   '/',
@@ -11,7 +11,7 @@ const STATIC_ASSETS = [
   '/styles/main.css',
   '/styles/animations.css',
   '/styles/evolution.css',
-  '/styles/mimo-evolution.css',   // V3.7 — replaces mimo.css
+  '/styles/mimo-evolution.css',
   '/scripts/data.js',
   '/scripts/db.js',
   '/scripts/auth.js',
@@ -20,7 +20,7 @@ const STATIC_ASSETS = [
   '/scripts/evolution_data.js',
   '/scripts/evolution_db.js',
   '/scripts/evolution_widget.js',
-  '/scripts/mimo-evolution.js',   // V3.7 — replaces mimo.js
+  '/scripts/mimo-evolution.js',
   '/scripts/app.js',
   '/manifest.json',
   '/assets/mascots/mimo-base.webp',
@@ -29,7 +29,6 @@ const STATIC_ASSETS = [
   '/assets/mascots/mimo-bird.webp',
 ];
 
-// Install — pre-cache all static assets
 self.addEventListener('install', event => {
   event.waitUntil(
     caches.open(CACHE_NAME)
@@ -42,24 +41,20 @@ self.addEventListener('install', event => {
   );
 });
 
-// Activate — delete old caches
 self.addEventListener('activate', event => {
   event.waitUntil(
     caches.keys()
       .then(keys => Promise.all(
-        keys
-          .filter(k => k !== CACHE_NAME)
-          .map(k => caches.delete(k))
+        keys.filter(k => k !== CACHE_NAME).map(k => caches.delete(k))
       ))
       .then(() => self.clients.claim())
   );
 });
 
-// Fetch strategy
 self.addEventListener('fetch', event => {
   const url = new URL(event.request.url);
 
-  // Supabase API — network first, silent fallback
+  // Supabase — network first, silent offline fallback
   if (url.hostname.includes('supabase.co')) {
     event.respondWith(
       fetch(event.request).catch(() =>
@@ -72,11 +67,9 @@ self.addEventListener('fetch', event => {
     return;
   }
 
-  // Google Fonts — cache first
-  if (
-    url.hostname.includes('fonts.googleapis.com') ||
-    url.hostname.includes('fonts.gstatic.com')
-  ) {
+  // Fonts — cache first
+  if (url.hostname.includes('fonts.googleapis.com') ||
+      url.hostname.includes('fonts.gstatic.com')) {
     event.respondWith(
       caches.match(event.request).then(cached => {
         if (cached) return cached;
@@ -90,7 +83,7 @@ self.addEventListener('fetch', event => {
     return;
   }
 
-  // Mimo WebP assets — cache first (high priority)
+  // Mascot images — cache first (high priority offline)
   if (url.pathname.includes('/assets/mascots/')) {
     event.respondWith(
       caches.match(event.request).then(cached => {
@@ -101,10 +94,7 @@ self.addEventListener('fetch', event => {
             caches.open(CACHE_NAME).then(c => c.put(event.request, clone));
           }
           return res;
-        }).catch(() => {
-          // Return empty transparent PNG as ultimate fallback
-          return new Response('', { status: 404 });
-        });
+        }).catch(() => new Response('', { status: 404 }));
       })
     );
     return;
@@ -120,7 +110,6 @@ self.addEventListener('fetch', event => {
         caches.open(CACHE_NAME).then(c => c.put(event.request, clone));
         return res;
       }).catch(() => {
-        // Offline: try to return index for navigation requests
         if (event.request.mode === 'navigate') {
           return caches.match('/index.html');
         }
@@ -129,7 +118,6 @@ self.addEventListener('fetch', event => {
   );
 });
 
-// Background sync
 self.addEventListener('sync', event => {
   if (event.tag === 'sync-results') {
     event.waitUntil(
