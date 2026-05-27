@@ -1,8 +1,8 @@
 // ═══════════════════════════════════════════════════════
-// Academia das Questões V3.7.1 — Service Worker
+// Academia das Questões V3.8 — Service Worker
 // ═══════════════════════════════════════════════════════
 
-const CACHE_NAME = 'academia-v371-cache-v1';
+const CACHE_NAME = 'academia-v38-cache-v1';
 
 const STATIC_ASSETS = [
   '/',
@@ -12,6 +12,7 @@ const STATIC_ASSETS = [
   '/styles/animations.css',
   '/styles/evolution.css',
   '/styles/mimo-evolution.css',
+  '/styles/mascot-bar.css',         // V3.8 new
   '/scripts/data.js',
   '/scripts/db.js',
   '/scripts/auth.js',
@@ -21,8 +22,17 @@ const STATIC_ASSETS = [
   '/scripts/evolution_db.js',
   '/scripts/evolution_widget.js',
   '/scripts/mimo-evolution.js',
+  '/scripts/xp-engine.js',          // V3.8 new
+  '/scripts/mascot-resolver.js',    // V3.8 new
   '/scripts/app.js',
   '/manifest.json',
+  // Stage-0 always cached
+  '/assets/mascots/mimo/stage-0/origem.png',
+  // Stage-1 class assets
+  '/assets/mascots/mimo/stage-1/mamifero.png',
+  '/assets/mascots/mimo/stage-1/reptil.png',
+  '/assets/mascots/mimo/stage-1/ave.png',
+  // Fallback companion images (V3.7)
   '/assets/mascots/mimo-base.webp',
   '/assets/mascots/mimo-mammal.webp',
   '/assets/mascots/mimo-reptile.webp',
@@ -35,7 +45,8 @@ self.addEventListener('install', event => {
       .then(cache => cache.addAll(STATIC_ASSETS))
       .then(() => self.skipWaiting())
       .catch(err => {
-        console.warn('[SW] Pre-cache partial failure (non-fatal):', err);
+        // Non-fatal: some assets may not exist yet
+        console.warn('[SW V3.8] Pre-cache partial:', err);
         return self.skipWaiting();
       })
   );
@@ -54,7 +65,7 @@ self.addEventListener('activate', event => {
 self.addEventListener('fetch', event => {
   const url = new URL(event.request.url);
 
-  // Supabase — network first, silent offline fallback
+  // Supabase — network first, silent fallback
   if (url.hostname.includes('supabase.co')) {
     event.respondWith(
       fetch(event.request).catch(() =>
@@ -83,7 +94,7 @@ self.addEventListener('fetch', event => {
     return;
   }
 
-  // Mascot images — cache first (high priority offline)
+  // Mascot assets — cache first, lazy-cache new ones
   if (url.pathname.includes('/assets/mascots/')) {
     event.respondWith(
       caches.match(event.request).then(cached => {
@@ -100,7 +111,7 @@ self.addEventListener('fetch', event => {
     return;
   }
 
-  // All other static — cache first, network fallback
+  // Everything else — cache first
   event.respondWith(
     caches.match(event.request).then(cached => {
       if (cached) return cached;

@@ -12,13 +12,16 @@
   <link rel="manifest" href="/manifest.json">
   <link rel="apple-touch-icon" href="/assets/icons/icon-192.png">
   <link rel="icon" type="image/png" href="/assets/icons/icon-192.png">
-  <!-- V2 styles (unchanged) -->
+
+  <!-- V2 core styles (unchanged) -->
   <link rel="stylesheet" href="/styles/main.css">
   <link rel="stylesheet" href="/styles/animations.css">
   <!-- V3 evolution styles (unchanged) -->
   <link rel="stylesheet" href="/styles/evolution.css">
-  <!-- V3.7.1 Mimo (replaces mimo.css and mimo-evolution.css from V3.7) -->
+  <!-- V3.7.1 Mimo companion -->
   <link rel="stylesheet" href="/styles/mimo-evolution.css">
+  <!-- V3.8 Mascot dashboard bar -->
+  <link rel="stylesheet" href="/styles/mascot-bar.css">
 </head>
 <body>
 
@@ -104,7 +107,7 @@
     <div class="badges-row" id="badges-row"></div>
   </div>
 
-  <!-- Mimo widget slot -->
+  <!-- V3.8: Mascot evolution bar — MascotResolver renders here -->
   <div style="padding:0 16px;">
     <div id="mimo-widget-slot"></div>
   </div>
@@ -137,33 +140,40 @@
   </div>
 </div>
 
-<!-- ══════ SYNC ══════ -->
+<!-- Sync indicator -->
 <div class="sync-indicator" id="sync-indicator">
   <div class="sync-dot"></div>
   <span class="sync-text">Salvando...</span>
 </div>
 
-<!-- ══════ INSTALL ══════ -->
+<!-- Install prompt -->
 <div class="install-prompt" id="install-prompt">
   <p>📲 Instale a <strong>Academia das Questões</strong> no celular!</p>
   <button class="btn-install" id="btn-install">Instalar</button>
   <button class="btn-dismiss" id="btn-dismiss">✕</button>
 </div>
 
-<!-- ══════════════ SCRIPTS ══════════════ -->
-<!-- V2 core — load first, unchanged -->
+<!-- ══════════════ SCRIPTS — load order matters ══════════════ -->
+<!-- V2 core (unchanged) -->
 <script src="/scripts/data.js"></script>
 <script src="/scripts/db.js"></script>
 <script src="/scripts/auth.js"></script>
 <script src="/scripts/gamification.js"></script>
 <script src="/scripts/ui.js"></script>
-<!-- V3 evolution — guarded inside app.js -->
+
+<!-- V3 evolution system (unchanged, guarded in app.js) -->
 <script src="/scripts/evolution_data.js"></script>
 <script src="/scripts/evolution_db.js"></script>
 <script src="/scripts/evolution_widget.js"></script>
-<!-- V3.7.1 Mimo (single file, all-in-one) -->
+
+<!-- V3.7.1 Mimo companion -->
 <script src="/scripts/mimo-evolution.js"></script>
-<!-- App — LAST -->
+
+<!-- V3.8 NEW: XP engine + mascot resolver -->
+<script src="/scripts/xp-engine.js"></script>
+<script src="/scripts/mascot-resolver.js"></script>
+
+<!-- App controller — LAST -->
 <script src="/scripts/app.js"></script>
 
 </body>
